@@ -1,0 +1,22 @@
+.core .o--if-js,
+.enhanced .o--if-no-js { display: none !important; }
+
+html, body{
+  width: 100%;
+  height: 100%;
+  background:#FFF1E0;
+}
+
+html {
+  /* Set a font family on the whole document */
+  font-family: Helvetica, Arial, sans-serif;
+
+  /* Prevent navigation menus from creating
+  extra space on sides of the page */
+  overflow-x: hidden;
+}
+
+body {
+  /* Remove space around the document */
+  margin: 0;
+}

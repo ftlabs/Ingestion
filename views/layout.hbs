@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://origami-build.ft.com/v2/bundles/css?modules=o-header-services@^1.0.0-beta.2,o-techdocs@^6.1.2" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script>
+      var cutsTheMustard = ('querySelector' in document && 'localStorage' in window && 'addEventListener' in window);
+
+      if (cutsTheMustard) {
+        // Swap the `core` class on the HTML element for an `enhanced` one
+        // We're doing it early in the head to avoid a flash of unstyled content
+        document.documentElement.className = document.documentElement.className.replace(/\bcore\b/g, 'enhanced');
+      }
+    </script>
+    <script src="//polyfill.webservices.ft.com/v1/polyfill.min.js"></script>
+  </head>
+  <body>
+
+    <header class="o-header-services" data-o-component="o-header">
+      <div class="o-header-services__top o-header-services__container">
+        <div class="o-header-services__ftlogo"></div>
+        <div class="o-header-services__title">
+          <h1 class="o-header-services__product-name">FT Labs Ingester</h1>
+        </div>
+      </div>
+    </header>
+    <div class="o-techdocs-container">
+      <div class="o-techdocs-layout">
+        {{{body}}}
+      </div>
+    </div>
+    <script>
+		(function(src) {
+			if (cutsTheMustard) {
+				var o = document.createElement('script');
+				o.async = o.defer = true;
+				o.src = src;
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(o, s);
+			}
+		}('https://origami-build.ft.com/v2/bundles/js?modules=o-header-services@^1.0.0-beta.2,o-techdocs@^6.1.2'));
+	</script>
+  </body>
+</html>
