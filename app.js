@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', require('./routes/redirect'));
 app.use('/ft', require('./routes/ft'));
-app.use('/partner', require('./routes/partner'));
+app.use('/feed', require('./routes/feed'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
