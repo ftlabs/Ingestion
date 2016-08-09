@@ -6,7 +6,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:uuid', function(req, res, next) {
-//   res.render('content', { title: 'FT Content' });
+
 	res.send('OK');
 });
 
