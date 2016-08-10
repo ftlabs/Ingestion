@@ -5,8 +5,16 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv').config();
+const hsts = require('hsts');
+const express_enforces_ssl = require('express-enforces-ssl');
 
 const app = express();
+
+if(process.env.ENVIRONMENT !== "dev"){
+  app.use(hsts({ maxAge: 7776000000, force: true })); // 90 
+  app.enable('trust proxy');
+  app.use(express_enforces_ssl());
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
