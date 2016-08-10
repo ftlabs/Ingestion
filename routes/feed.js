@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const isUUID = require('is-uuid');
 const debug = require('debug')('routes:partner');
+const MongoClient = require('mongodb').MongoClient;
 
 const validCredentials = require('../bin/lib/checkcreds');
 const getContent = require('../bin/lib/content');
@@ -15,23 +16,36 @@ router.get('/all', function(req, res, next){
 
 	if(validCredentials(req, res)){
 
-		const articles = [
-			getContent('48235c16-5e1d-11e6-bb77-a121aa8abd95'),
-			getContent('e5e64860-5df9-11e6-bb77-a121aa8abd95'),
-			getContent('3a2307f0-5d3d-11e6-a72a-bd4bf1198c63'),
-			getContent('f5e79520-5d59-11e6-a72a-bd4bf1198c63'),
-			getContent('b28e83a6-5d86-11e6-a72a-bd4bf1198c63')
-		];
+		const mongoURL = process.env.MONGO_ENDPOINT;
 
-		Promise.all(articles)
-			.then(articles => rssify(articles))
-			.then(XML => {
-				res.send(XML);
+		MongoClient.connect(mongoURL, function(err, db) {
+
+			if(err){
+				console.log(err);
+			}
+
+			var collection = db.collection('articles');
+
+			collection.find({}).toArray(function(err, entries){
+				
+				const articles = entries.map(entry => {
+					return getContent(entry.uuid);
+				});
+
+				Promise.all(articles)
+					.then(articles => rssify(articles))
+					.then(XML => {
+						res.send(XML);
+					})
+					.catch(err => {
+						console.log('Error', err);
+					})
+				;
+
 			})
-			.catch(err => {
-				console.log('Error', err);
-			})
-		;
+
+		});
+
 	}
 
 });
