@@ -13,7 +13,7 @@ const rssify = require('../bin/lib/rssify');
 const extractUUID = require('../bin/lib/check-uuid');
 
 router.get('/', function(req, res, next) {
-  res.render('content', { title: 'FT Content' });
+	res.redirect('/feed/all');
 });
 
 router.get('/all', function(req, res, next){

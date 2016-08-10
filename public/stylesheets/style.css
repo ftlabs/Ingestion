@@ -22,7 +22,7 @@ body {
 }
 
 h1{
-  /*width: 100%;*/
+  width: 100%;
 }
 
 table thead{
@@ -44,4 +44,9 @@ table.exposed-articles tbody tr td:nth-child(2){
 table.exposed-articles tbody tr td:nth-child(2) a{
   color: red;
   text-decoration: none;
+}
+
+.o-techdocs-layout{
+  display: flex;
+  align-items: center;
 }
