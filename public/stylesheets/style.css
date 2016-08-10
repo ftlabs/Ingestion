@@ -20,3 +20,7 @@ body {
   /* Remove space around the document */
   margin: 0;
 }
+
+h1{
+  /*width: 100%;*/
+}

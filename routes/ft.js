@@ -19,7 +19,7 @@ router.get('/add', function(req, res, next) {
 });
 
 router.post('/add', (req, res, next) => {
-
+  console.log(req.body);
   let articleUUID = req.body.uuid;
 
   let uuidRegex = /([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})/i;
@@ -30,7 +30,7 @@ router.post('/add', (req, res, next) => {
   console.log("UUID:", articleUUID);
 
   if(!articleUUID || !isUUID.anyNonNil(articleUUID)){
-    res.send("Not a valid UUID");
+    res.redirect("/ft/add?success=false");
     return
   } else {
     
@@ -54,7 +54,7 @@ router.post('/add', (req, res, next) => {
           return;
         } else {
           console.log(articleUUID, 'has been exposed to 3rd parties');
-          res.send("OK");
+          res.redirect("/ft/add?success=true");
         }
 
 

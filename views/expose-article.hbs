@@ -1,6 +1,36 @@
-<form id="signup-form" novalidate="" method="POST" action="/ft/add">
-	<input type="text" name="uuid" placeholder="Insert a Content API UUID or article URL here" class="o-forms-text"/>
-	<button type="submit" class="o-buttons o-buttons--standout o-buttons--big">Add</submit>
-</form>
 
-<script src="/javascripts/form-submit.js"></script>
+<div class="12 S10 M7 L6 center">
+	<h1>Allow access to an article</h1>
+	<form id="signup-form" novalidate="" method="POST" action="/ft/add">
+		<div class="o-forms-group">
+			<label class="o-forms-label">Article URL / UUID</label>
+			<input type="text" name="uuid" placeholder="Insert a Content API UUID or article URL here" class="o-forms-text"/>
+		</div>
+		<button type="submit" class="o-buttons o-buttons--standout o-buttons--big">Add</submit>
+	</form>
+
+</div>
+
+<script>
+
+	var queryString = window.location.search;
+	queryString = queryString.split("?")[1].split("&");
+
+	var queryParams = {};
+
+	for(var x = 0; x < queryString.length; x += 1){
+		var splitString = queryString[x].split('=');
+		queryParams[splitString[0]] = splitString[1];
+	}
+
+	if(queryParams.success){
+
+		if(queryParams.success === "true"){
+			console.log("success");
+		} else {
+			console.log("No success");
+		}
+
+	}
+
+</script>
