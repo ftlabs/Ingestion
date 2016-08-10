@@ -40,3 +40,8 @@ table tbody tr:nth-child(even){
 table.exposed-articles tbody tr td:nth-child(2){
   text-align: right;
 }
+
+table.exposed-articles tbody tr td:nth-child(2) a{
+  color: red;
+  text-decoration: none;
+}

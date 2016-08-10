@@ -4,9 +4,13 @@ const isUUID = require('is-uuid');
 const debug = require('debug')('routes:partner');
 const MongoClient = require('mongodb').MongoClient;
 
+const mongoURL = process.env.MONGO_ENDPOINT;
+
 const validCredentials = require('../bin/lib/checkcreds');
 const getContent = require('../bin/lib/content');
 const rssify = require('../bin/lib/rssify');
+
+const extractUUID = require('../bin/lib/check-uuid');
 
 router.get('/', function(req, res, next) {
   res.render('content', { title: 'FT Content' });
@@ -15,8 +19,6 @@ router.get('/', function(req, res, next) {
 router.get('/all', function(req, res, next){
 
 	if(validCredentials(req, res)){
-
-		const mongoURL = process.env.MONGO_ENDPOINT;
 
 		MongoClient.connect(mongoURL, function(err, db) {
 
@@ -52,25 +54,59 @@ router.get('/all', function(req, res, next){
 
 router.get('/item/:uuid', function(req, res, next) {
 
-	if(validCredentials(req, res)){
+	const articleUUID = extractUUID(req.params.uuid);
 
-		const articleUUID = req.params.uuid;
+	if(!articleUUID){
 
-		if(!articleUUID || !isUUID.anyNonNil(articleUUID)){
-			res.send("Not a valid UUID");
-			return
-		} else {
+		res.status(404);
+		res.send("That is not a valid UUID");
 
-			getContent(articleUUID)
-				.then(content => {
-					res.send(content.bodyXML);
-				})
-				.catch(err => {
+	} else {
+
+		MongoClient.connect(mongoURL, function(err, db){
+
+			if(err){
+				console.log(err);
+				res.status(500);
+				res.send("Error connecting to database");
+				return;
+			}
+
+			const collection = db.collection('articles');
+
+			collection.findOne({
+				uuid : articleUUID
+			}, {}, function(err, item){
+				console.log("ITEM:", item);
+
+				if(err){
 					console.log(err);
-				})
-			;			
+					res.status(500);
+					res.end();
+					return;
+				}
 
-		}
+				if(item === null){
+					res.status(401);
+					res.send("You are not able to access that item");
+				} else {
+
+					getContent(articleUUID)
+						.then(content => {
+							res.send(content.bodyXML);
+						})
+						.catch(err => {
+							console.log(err);
+						})
+					;
+				
+				}
+
+			});
+		
+
+
+		});
 
 	}
 
