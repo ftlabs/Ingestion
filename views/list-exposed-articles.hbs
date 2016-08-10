@@ -1,1 +1,18 @@
-<h1>Visibile Articles</h1>
+<h1>{{title}}</h1>
+
+<table class="o-table exposed-articles" data-o-component="o-table" >
+
+	<thead>
+		<th>Content UUID</th>
+		<th></th>
+	</thead>
+
+	<tbody>
+		{{#each visibleDocs}}
+			<tr>
+				<td><a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a></td><td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
+			</tr>
+		{{/each}}
+	</tbody>
+
+</table>

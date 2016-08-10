@@ -1,68 +1,125 @@
 const express = require('express');
 const router = express.Router();
 const S3O = require('s3o-middleware');
-const isUUID = require('is-uuid');
 const MongoClient = require('mongodb').MongoClient;
 
+const extractUUID = require('../bin/lib/check-uuid');
+
+const mongoURL = process.env.MONGO_ENDPOINT;
+
 router.use(S3O);
-
-/* GET home page. */
-
 router.get('/', function(req, res, next){
 
-  res.render('list-exposed-articles', {title : "Accessible Articles"});
+	MongoClient.connect(mongoURL, function(err, db){
+
+		if(err){
+			res.status(500);
+			res.send("Error connecting to database");
+			return;
+		}
+
+		const articles = db.collection('articles');
+
+		articles.find({}).toArray(function(err, docs){
+
+			if(err){
+				console.log(err);
+				res.status(500);
+				res.end();
+				return;
+			}
+
+			console.log(docs);
+			res.render('list-exposed-articles', {title : "Accessible Articles", visibleDocs : Array.from(docs) });
+
+		});
+
+	});
 
 });
 
 router.get('/add', function(req, res, next) {
-  res.render('expose-article', { title: 'Expose an article' });
+	res.render('expose-article', { title: 'Expose an article' });
 });
 
 router.post('/add', (req, res, next) => {
-  console.log(req.body);
-  let articleUUID = req.body.uuid;
 
-  let uuidRegex = /([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})/i;
-  let matchedUUID = uuidRegex.exec(articleUUID);
+	const articleUUID = extractUUID(req.body.uuid);
 
-  articleUUID = matchedUUID ? matchedUUID[1] : null; 
+	console.log("UUID:", articleUUID);
 
-  console.log("UUID:", articleUUID);
+	if(!articleUUID){
+		res.redirect("/ft/add?success=false");
+	} else {
 
-  if(!articleUUID || !isUUID.anyNonNil(articleUUID)){
-    res.redirect("/ft/add?success=false");
-    return
-  } else {
-    
-    const mongoURL = process.env.MONGO_ENDPOINT;
+		MongoClient.connect(mongoURL, function(err, db) {
 
-    MongoClient.connect(mongoURL, function(err, db) {
+			if(err){
+				console.log(err);
+				res.status(500);
+				res.send("Error connecting to database");
+				return;
+			}
+			const collection = db.collection('articles');
 
-      if(err){
-        console.log(err);
-      }
-      
-      var collection = db.collection('articles');
-      collection.insertOne({
-        uuid : articleUUID
-      }, function(err, result){
+			collection.updateOne({uuid : articleUUID}, {uuid : articleUUID}, {upsert : true}, function(err, result){
+				if(err){
+					console.log(err);
+					res.status(500);
+					res.end();
+				} else {
+					console.log(articleUUID, 'has been exposed to 3rd parties');
+					res.redirect("/ft/add?success=true");
+				}
+			});
 
-        if(err){
-          console.log(err);
-          res.status(500);
-          res.end();
-          return;
-        } else {
-          console.log(articleUUID, 'has been exposed to 3rd parties');
-          res.redirect("/ft/add?success=true");
-        }
+			db.close();
 
+		});
 
-      })
+	}
 
-    });
+});
 
-  }
+router.get('/delete/:uuid', function(req, res, next){
+
+	const articleUUID = extractUUID(req.params.uuid);
+
+	if(!articleUUID){
+		res.redirect(`/ft?deleted=false&uuid=${articleUUID}`);
+	} else {
+
+		MongoClient.connect(mongoURL, function(err, db){
+
+			if(err){
+				console.log(err);
+				res.status(500);
+				res.send("Error connecting to database");
+				return;
+			}
+
+			const collection = db.collection('articles');
+			collection.deleteOne({
+				uuid : articleUUID
+			}, function(err, result){
+
+				if(err){
+					console.log(err);
+					res.status(500);
+					res.send("An error occurred deleting that article from the database");
+				} else {
+					console.log(`Article ${articleUUID} is no longer visible to 3rd parties`);
+					res.redirect(`/ft?deleted=true&uuid=${articleUUID}`);
+				}
+
+			})
+
+			db.close();
+			
+		});
+
+	}
+
 
 });
 
