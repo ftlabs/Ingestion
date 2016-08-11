@@ -56,7 +56,7 @@ router.get('/item/:uuid', function(req, res, next) {
 
 	if(validCredentials(req, res)){
 
-		const articleUUID = extractUUID(req.params.uuid)
+		extractUUID(req.params.uuid)
 			.then(articleUUID => {
 
 				MongoClient.connect(mongoURL, function(err, db){
@@ -111,14 +111,6 @@ router.get('/item/:uuid', function(req, res, next) {
 			})
 
 		;
-		
-	}
-
-	if(!articleUUID){
-
-
-	} else {
-
 
 	}
 
