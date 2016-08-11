@@ -54,61 +54,66 @@ router.get('/all', function(req, res, next){
 
 router.get('/item/:uuid', function(req, res, next) {
 
-	const articleUUID = extractUUID(req.params.uuid)
-		.then(articleUUID => {
+	if(validCredentials(req, res)){
 
-			MongoClient.connect(mongoURL, function(err, db){
+		const articleUUID = extractUUID(req.params.uuid)
+			.then(articleUUID => {
 
-				if(err){
-					console.log(err);
-					res.status(500);
-					res.send("Error connecting to database");
-					return;
-				}
-
-				const collection = db.collection('articles');
-
-				collection.findOne({
-					uuid : articleUUID
-				}, {}, function(err, item){
-					console.log("ITEM:", item);
+				MongoClient.connect(mongoURL, function(err, db){
 
 					if(err){
 						console.log(err);
 						res.status(500);
-						res.end();
+						res.send("Error connecting to database");
 						return;
 					}
 
-					if(item === null){
-						res.status(401);
-						res.send("UUID not found");
-					} else {
+					const collection = db.collection('articles');
 
-						getContent(articleUUID)
-							.then(content => {
-								res.send(content.bodyXML);
-							})
-							.catch(err => {
-								console.log(err);
-							})
-						;
-					
-					}
+					collection.findOne({
+						uuid : articleUUID
+					}, {}, function(err, item){
+						console.log("ITEM:", item);
+
+						if(err){
+							console.log(err);
+							res.status(500);
+							res.end();
+							return;
+						}
+
+						if(item === null){
+							res.status(401);
+							res.send("UUID not found");
+						} else {
+
+							getContent(articleUUID)
+								.then(content => {
+									res.send(content.bodyXML);
+								})
+								.catch(err => {
+									console.log(err);
+								})
+							;
+						
+						}
+
+					});
+				
+
 
 				});
-			
+				
+			})
+			.catch(err => {
+				res.status(404);
+				res.send("That is not a valid UUID");
+			})
 
+		;
+		
+	}
 
-			});
-			
-		})
-		.catch(err => {
-			res.status(404);
-			res.send("That is not a valid UUID");
-		})
-
-	;
 	if(!articleUUID){
 
 
