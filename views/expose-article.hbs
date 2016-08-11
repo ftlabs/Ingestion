@@ -9,10 +9,15 @@
 		<button type="submit" class="o-buttons o-buttons--standout o-buttons--big">Add</button>
 	</form>
 
+	<div class="overlay" data-visible="false"></div>
+
 </div>
 
 <script>
 
+	var overlay = document.querySelector('.overlay');
+	var initialOverlayClasses = overlay.getAttribute('class');
+	
 	var queryString = window.location.search;
 	queryString = queryString.split("?")[1].split("&");
 
@@ -23,12 +28,33 @@
 		queryParams[splitString[0]] = splitString[1];
 	}
 
+	function showOverlay(success, msg, time){
+
+		if(success){
+			overlay.classList.add('success');	
+		} else {
+			overlay.classList.add('failure');
+		}
+
+		overlay.textContent = msg;
+		overlay.dataset.visible = "true";
+
+		setTimeout(function(){
+			overlay.textContent = "";
+			overlay.setAttribute('class', initialOverlayClasses);
+			overlay.dataset.visible = "false";
+		}, 3000);
+
+	}
+
+
 	if(queryParams.success){
 
 		if(queryParams.success === "true"){
-			console.log("success");
+			showOverlay(true, "Article successfully added", 3000);
 		} else {
-			console.log("No success");
+			showOverlay(false, "Article was not added", 3000);
+			
 		}
 
 	}

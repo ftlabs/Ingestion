@@ -50,3 +50,29 @@ table.exposed-articles tbody tr td:nth-child(2) a{
   display: flex;
   align-items: center;
 }
+
+.overlay{
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 50%;
+  height: 40px;
+  margin-top: -20px;
+  box-shadow: 0 3px 5px black;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+
+.overlay[data-visible="true"]{
+  display: flex;
+}
+
+.overlay.success{
+  background: green;
+}
+
+.overlay.failure{
+  background: #b70e0e;
+}
