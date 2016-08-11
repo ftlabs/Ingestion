@@ -13,7 +13,7 @@
 		
 			{{#each visibleDocs}}
 				<tr>
-					<td><a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a></td> <td>This is the article headline</td> <td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
+					<td><a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a></td> <td>{{this.headline}}</td> <td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
 				</tr>
 			{{/each}}
 
