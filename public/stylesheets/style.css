@@ -37,7 +37,7 @@ table tbody tr:nth-child(even){
   background-color: rgba(0,0,0,.05);
 }
 
-table.exposed-articles tbody tr td:nth-child(2){
+table.exposed-articles tbody tr td:last-of-type{
   text-align: right;
 }
 

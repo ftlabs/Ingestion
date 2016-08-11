@@ -3,15 +3,25 @@
 
 	<thead>
 		<th>Content UUID</th>
+		<th>Headline</th>
 		<th></th>
 	</thead>
 
 	<tbody>
-		{{#each visibleDocs}}
+
+		{{#if visibleDocs}}
+		
+			{{#each visibleDocs}}
+				<tr>
+					<td><a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a></td> <td>This is the article headline</td> <td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
+				</tr>
+			{{/each}}
+
+		{{else}}
 			<tr>
-				<td><a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a></td><td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
+				<td>No articles are available for 3rd party consumption...</td><td></td>
 			</tr>
-		{{/each}}
+		{{/if}}
 	</tbody>
 
 </table>

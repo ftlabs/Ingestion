@@ -30,7 +30,10 @@ router.get('/', function(req, res, next){
 			}
 
 			console.log(docs);
-			res.render('list-exposed-articles', {title : "Accessible Articles", visibleDocs : Array.from(docs) });
+			res.render('list-exposed-articles', {
+				title : "Accessible Articles",
+				visibleDocs : Array.from(docs)
+			});
 
 		});
 
