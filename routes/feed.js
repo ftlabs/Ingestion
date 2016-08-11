@@ -10,7 +10,7 @@ const validCredentials = require('../bin/lib/checkcreds');
 const getContent = require('../bin/lib/content');
 const rssify = require('../bin/lib/rssify');
 
-const extractUUID = require('../bin/lib/check-uuid');
+const extractUUID = require('../bin/lib/extract-uuid');
 
 router.get('/', function(req, res, next) {
 	res.redirect('/feed/all');
@@ -54,59 +54,66 @@ router.get('/all', function(req, res, next){
 
 router.get('/item/:uuid', function(req, res, next) {
 
-	const articleUUID = extractUUID(req.params.uuid);
+	const articleUUID = extractUUID(req.params.uuid)
+		.then(articleUUID => {
 
-	if(!articleUUID){
-
-		res.status(404);
-		res.send("That is not a valid UUID");
-
-	} else {
-
-		MongoClient.connect(mongoURL, function(err, db){
-
-			if(err){
-				console.log(err);
-				res.status(500);
-				res.send("Error connecting to database");
-				return;
-			}
-
-			const collection = db.collection('articles');
-
-			collection.findOne({
-				uuid : articleUUID
-			}, {}, function(err, item){
-				console.log("ITEM:", item);
+			MongoClient.connect(mongoURL, function(err, db){
 
 				if(err){
 					console.log(err);
 					res.status(500);
-					res.end();
+					res.send("Error connecting to database");
 					return;
 				}
 
-				if(item === null){
-					res.status(401);
-					res.send("You are not able to access that item");
-				} else {
+				const collection = db.collection('articles');
 
-					getContent(articleUUID)
-						.then(content => {
-							res.send(content.bodyXML);
-						})
-						.catch(err => {
-							console.log(err);
-						})
-					;
-				
-				}
+				collection.findOne({
+					uuid : articleUUID
+				}, {}, function(err, item){
+					console.log("ITEM:", item);
+
+					if(err){
+						console.log(err);
+						res.status(500);
+						res.end();
+						return;
+					}
+
+					if(item === null){
+						res.status(401);
+						res.send("UUID not found");
+					} else {
+
+						getContent(articleUUID)
+							.then(content => {
+								res.send(content.bodyXML);
+							})
+							.catch(err => {
+								console.log(err);
+							})
+						;
+					
+					}
+
+				});
+			
+
 
 			});
-		
+			
+		})
+		.catch(err => {
+			res.status(404);
+			res.send("That is not a valid UUID");
+		})
+
+	;
+	if(!articleUUID){
 
 
-		});
+	} else {
+
 
 	}
 
