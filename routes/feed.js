@@ -41,6 +41,8 @@ router.get('/all', function(req, res, next){
 					})
 					.catch(err => {
 						console.log('Error', err);
+						res.status(500);
+						res.send("An error occurred");
 					})
 				;
 
