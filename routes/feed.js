@@ -12,7 +12,7 @@ const rssify = require('../bin/lib/rssify');
 
 const extractUUID = require('../bin/lib/extract-uuid');
 
-router.use( validCredentials );
+// router.use( validCredentials );
 
 router.get('/', function(req, res, next) {
 	res.redirect('/feed/all');
