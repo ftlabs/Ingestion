@@ -1,6 +1,6 @@
 const auth = require('basic-auth');
 
-module.exports = function(req, res){
+module.exports = function(req, res, next){
 
 	const credentials = auth(req);
 
@@ -10,7 +10,7 @@ module.exports = function(req, res){
 		res.end('Access denied');
 		return false
 	} else {
-		return true
+		next();
 	}
 
 }

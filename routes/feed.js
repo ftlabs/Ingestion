@@ -12,107 +12,105 @@ const rssify = require('../bin/lib/rssify');
 
 const extractUUID = require('../bin/lib/extract-uuid');
 
+router.use( validCredentials );
+
 router.get('/', function(req, res, next) {
 	res.redirect('/feed/all');
 });
 
+
 router.get('/all', function(req, res, next){
 
-	if(validCredentials(req, res)){
+	MongoClient.connect(mongoURL, function(err, db) {
 
-		MongoClient.connect(mongoURL, function(err, db) {
+		if(err){
+			console.log(err);
+		}
 
-			if(err){
-				console.log(err);
-			}
+		var collection = db.collection('articles');
 
-			var collection = db.collection('articles');
+		collection.find({}).toArray(function(err, entries){
+			
+			const articles = entries.map(entry => {
+				return getContent(entry.uuid);
+			});
 
-			collection.find({}).toArray(function(err, entries){
-				
-				const articles = entries.map(entry => {
-					return getContent(entry.uuid);
-				});
+			Promise.all(articles)
+				.then(articles => rssify(articles))
+				.then(XML => {
+					res.send(XML);
+				})
+				.catch(err => {
+					console.log('Error', err);
+					res.status(500);
+					res.send("An error occurred");
+				})
+			;
 
-				Promise.all(articles)
-					.then(articles => rssify(articles))
-					.then(XML => {
-						res.send(XML);
-					})
-					.catch(err => {
-						console.log('Error', err);
-					})
-				;
+		})
 
-			})
+	});
 
-		});
-
-	}
 
 });
 
 router.get('/item/:uuid', function(req, res, next) {
 
-	if(validCredentials(req, res)){
+	extractUUID(req.params.uuid)
+		.then(articleUUID => {
 
-		extractUUID(req.params.uuid)
-			.then(articleUUID => {
+			MongoClient.connect(mongoURL, function(err, db){
 
-				MongoClient.connect(mongoURL, function(err, db){
+				if(err){
+					console.log(err);
+					res.status(500);
+					res.send("Error connecting to database");
+					return;
+				}
+
+				const collection = db.collection('articles');
+
+				collection.findOne({
+					uuid : articleUUID
+				}, {}, function(err, item){
+					console.log("ITEM:", item);
 
 					if(err){
 						console.log(err);
 						res.status(500);
-						res.send("Error connecting to database");
+						res.end();
 						return;
 					}
 
-					const collection = db.collection('articles');
+					if(item === null){
+						res.status(401);
+						res.send("UUID not found");
+					} else {
 
-					collection.findOne({
-						uuid : articleUUID
-					}, {}, function(err, item){
-						console.log("ITEM:", item);
-
-						if(err){
-							console.log(err);
-							res.status(500);
-							res.end();
-							return;
-						}
-
-						if(item === null){
-							res.status(401);
-							res.send("UUID not found");
-						} else {
-
-							getContent(articleUUID)
-								.then(content => {
-									res.send(content.bodyXML);
-								})
-								.catch(err => {
-									console.log(err);
-								})
-							;
-						
-						}
-
-					});
-				
-
+						getContent(articleUUID)
+							.then(content => {
+								res.send(content.bodyXML);
+							})
+							.catch(err => {
+								console.log(err);
+							})
+						;
+					
+					}
 
 				});
-				
-			})
-			.catch(err => {
-				res.status(404);
-				res.send("That is not a valid UUID");
-			})
+			
 
-		;
 
-	}
+			});
+			
+		})
+		.catch(err => {
+			res.status(404);
+			res.send("That is not a valid UUID");
+		})
+
+	;
 
 });
 
