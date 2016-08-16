@@ -18,7 +18,6 @@ router.get('/', function(req, res, next) {
 	res.redirect('/feed/all');
 });
 
-
 router.get('/all', function(req, res, next){
 
 	MongoClient.connect(mongoURL, function(err, db) {
