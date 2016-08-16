@@ -9,6 +9,7 @@ const mongoURL = process.env.MONGO_ENDPOINT;
 const validCredentials = require('../bin/lib/checkcreds');
 const getContent = require('../bin/lib/content');
 const rssify = require('../bin/lib/rssify');
+const databaseError = require('../bin/lib/database-error');
 
 const extractUUID = require('../bin/lib/extract-uuid');
 
@@ -24,6 +25,8 @@ router.get('/all', function(req, res, next){
 
 		if(err){
 			console.log(err);
+			databaseError(res, "Error connecting to the database", err);
+			return;
 		}
 
 		const noTags = req.query.notags === "true";
@@ -63,8 +66,7 @@ router.get('/item/:uuid', function(req, res, next) {
 
 				if(err){
 					console.log(err);
-					res.status(500);
-					res.send("Error connecting to database");
+					databaseError(res, "Error connecting to the database", err);
 					return;
 				}
 

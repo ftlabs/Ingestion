@@ -5,17 +5,18 @@ const MongoClient = require('mongodb').MongoClient;
 
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
+const databaseError = require('../bin/lib/database-error');
 
 const mongoURL = process.env.MONGO_ENDPOINT;
 
 router.use(S3O);
+
 router.get('/', function(req, res, next){
 
 	MongoClient.connect(mongoURL, function(err, db){
 
 		if(err){
-			res.status(500);
-			res.send("Error connecting to database");
+			databaseError(res, "Error connecting to the database", err);
 			return;
 		}
 
@@ -55,9 +56,7 @@ router.post('/add', (req, res, next) => {
 			MongoClient.connect(mongoURL, function(err, db) {
 
 				if(err){
-					console.log(err);
-					res.status(500);
-					res.send("Error connecting to database");
+					databaseError(res, "Error connecting to the database", err);
 					return;
 				}
 				const collection = db.collection('articles');
@@ -94,9 +93,7 @@ router.get('/delete/:uuid', function(req, res, next){
 			MongoClient.connect(mongoURL, function(err, db){
 
 				if(err){
-					console.log(err);
-					res.status(500);
-					res.send("Error connecting to database");
+					databaseError(res, "Error connecting to the database", err);
 					return;
 				}
 
