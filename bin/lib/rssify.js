@@ -18,7 +18,7 @@ module.exports = function(items, shouldStripTags){
 
 		feed.item({
 			title : item.title,
-			description : `${item.bodyXML.substring(0, 100)}...`,
+			description : `${ reformat( item.bodyXML.substring(0, 100) ) }...`,
 			url : `${process.env.SERVER_ROOT}/feed/item/${item.uuid}`,
 			author : item.byline,
 			date : item.publishedDate,
