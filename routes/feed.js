@@ -26,6 +26,7 @@ router.get('/all', function(req, res, next){
 			console.log(err);
 		}
 
+		const noTags = req.query.notags === "true";
 		var collection = db.collection('articles');
 
 		collection.find({}).toArray(function(err, entries){
@@ -35,7 +36,7 @@ router.get('/all', function(req, res, next){
 			});
 
 			Promise.all(articles)
-				.then(articles => rssify(articles))
+				.then(articles => rssify(articles, noTags))
 				.then(XML => {
 					res.send(XML);
 				})

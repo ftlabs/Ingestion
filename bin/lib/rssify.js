@@ -1,7 +1,7 @@
 const RSS = require('rss');
 const reformat = require('./reformat');
 
-module.exports = function(items){
+module.exports = function(items, shouldStripTags){
 
 	if(!Array.isArray(items)){
 		items = [items];
@@ -23,7 +23,7 @@ module.exports = function(items){
 			author : item.byline,
 			date : item.publishedDate,
 			custom_elements : [
-				{content : item.bodyXML }
+				{content : shouldStripTags === true ? reformat (item.bodyXML) : item.bodyXML }
 			]
 		});
 
