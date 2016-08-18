@@ -24,7 +24,7 @@ router.get('/all', function(req, res, next){
 	MongoClient.connect(mongoURL, function(err, db) {
 
 		if(err){
-			console.log(err);
+			debug(err);
 			databaseError(res, "Error connecting to the database", err);
 			return;
 		}
@@ -44,7 +44,7 @@ router.get('/all', function(req, res, next){
 					res.send(XML);
 				})
 				.catch(err => {
-					console.log('Error', err);
+					debug('Error', err);
 					res.status(500);
 					res.send("An error occurred");
 				})
@@ -65,7 +65,7 @@ router.get('/item/:uuid', function(req, res, next) {
 			MongoClient.connect(mongoURL, function(err, db){
 
 				if(err){
-					console.log(err);
+					debug(err);
 					databaseError(res, "Error connecting to the database", err);
 					return;
 				}
@@ -75,10 +75,10 @@ router.get('/item/:uuid', function(req, res, next) {
 				collection.findOne({
 					uuid : articleUUID
 				}, {}, function(err, item){
-					console.log("ITEM:", item);
+					debug("ITEM:", item);
 
 					if(err){
-						console.log(err);
+						debug(err);
 						res.status(500);
 						res.end();
 						return;
@@ -94,7 +94,7 @@ router.get('/item/:uuid', function(req, res, next) {
 								res.send(content.bodyXML);
 							})
 							.catch(err => {
-								console.log(err);
+								debug(err);
 							})
 						;
 					

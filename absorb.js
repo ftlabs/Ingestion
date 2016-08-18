@@ -27,9 +27,9 @@ function parseRSSFeed(text){
 }
 
 function checkForData(){
-	debug("Checking for data at", process.env.AUDIO_ENDPOINT);
+	debug("Checking for data at", process.env.AUDIO_RSS_ENDPOINT);
 
-	fetch(process.env.AUDIO_ENDPOINT)
+	fetch(process.env.AUDIO_RSS_ENDPOINT)
 		.then(res => res.text())
 		.then(text => parseRSSFeed(text))
 		.then(feed => {
@@ -38,7 +38,11 @@ function checkForData(){
 				// Let's check to see if we've already retrieved this item from SL
 				const itemUUID = item['ft:uid'];
 
-				// debug(itemUUID, item);
+				debug(itemUUID, item);
+
+				if(itemUUID === undefined){
+					return false;
+				}
 
 				S3.headObject({
 					Bucket : process.env.AWS_AUDIO_BUCKET,
@@ -96,8 +100,8 @@ function startPolling(interval, now){
 
 	now = now || false;
 
-	if(process.env.AUDIO_ENDPOINT === undefined){
-		debug("AUDIO_ENDPOINT environment variable is undefined. Will not poll.");
+	if(process.env.AUDIO_RSS_ENDPOINT === undefined){
+		debug("AUDIO_RSS_ENDPOINT environment variable is undefined. Will not poll.");
 		return false;
 	}
 

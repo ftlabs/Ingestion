@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const S3O = require('s3o-middleware');
 const MongoClient = require('mongodb').MongoClient;
+const debug = require('debug')('routes:ft');
 
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
@@ -25,13 +26,13 @@ router.get('/', function(req, res, next){
 		articles.find({}).toArray(function(err, docs){
 
 			if(err){
-				console.log(err);
+				debug(err);
 				res.status(500);
 				res.end();
 				return;
 			}
 
-			console.log(docs);
+			debug(docs);
 			res.render('list-exposed-articles', {
 				title : "Accessible Articles",
 				visibleDocs : Array.from(docs)
@@ -52,7 +53,7 @@ router.post('/add', (req, res, next) => {
 	const articleUUID = checkUUID(req.body.uuid)
 		.then(function(content){
 
-			console.log("UUID:", content.uuid);
+			debug("UUID:", content.uuid);
 			MongoClient.connect(mongoURL, function(err, db) {
 
 				if(err){
@@ -63,11 +64,11 @@ router.post('/add', (req, res, next) => {
 
 				collection.updateOne({uuid : content.uuid}, {uuid : content.uuid, headline: content.title}, {upsert : true}, function(err, result){
 					if(err){
-						console.log(err);
+						debug(err);
 						res.status(500);
 						res.end();
 					} else {
-						console.log(content.uuid, 'has been exposed to 3rd parties');
+						debug(content.uuid, 'has been exposed to 3rd parties');
 						res.redirect("/ft/add?success=true");
 					}
 				});
@@ -103,11 +104,11 @@ router.get('/delete/:uuid', function(req, res, next){
 				}, function(err, result){
 
 					if(err){
-						console.log(err);
+						debug(err);
 						res.status(500);
 						res.send("An error occurred deleting that article from the database");
 					} else {
-						console.log(`Article ${UUID} is no longer visible to 3rd parties`);
+						debug(`Article ${UUID} is no longer visible to 3rd parties`);
 						res.redirect(`/ft?deleted=true&uuid=${UUID}`);
 					}
 
