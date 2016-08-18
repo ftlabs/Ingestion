@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+const dotenv = require('dotenv').config();
 var app = require('../app');
 var debug = require('debug')('Ingestion:server');
 var http = require('http');

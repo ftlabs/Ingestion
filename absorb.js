@@ -101,6 +101,11 @@ function startPolling(interval, now){
 		return false;
 	}
 
+	if(process.env.AWS_AUDIO_BUCKET === undefined){
+		debug('AWS_AUDIO_BUCKET environment variable is not defined. Will not poll.');
+		return false;
+	}
+
 	poll = setInterval(checkForData, interval);
 	if(now){
 		checkForData();
