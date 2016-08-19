@@ -25,6 +25,10 @@ h1{
   width: 100%;
 }
 
+table{
+  table-layout: fixed;
+}
+
 table thead{
   background-color: rgba(0,0,0,.3);
 }
@@ -33,17 +37,26 @@ table tr{
   border: 1px solid rgba(0,0,0,.3);
 }
 
+table thead th:first-of-type{
+  width: 300px;
+}
+
 table tbody tr:nth-child(even){
   background-color: rgba(0,0,0,.05);
 }
 
-table.exposed-articles tbody tr td:last-of-type{
+table.exposed-articles thead th:last-of-type, table.exposed-articles thead th:last-of-type, table.exposed-articles tbody tr td:last-of-type{
   text-align: right;
+  width: 80px;
 }
 
-table.exposed-articles tbody tr td:nth-child(2) a{
+table.exposed-articles tbody tr td:nth-child(4) a{
   color: red;
   text-decoration: none;
+}
+
+table.exposed-articles thead th.recorded{
+  width: 80px;
 }
 
 .o-techdocs-layout{
