@@ -19,7 +19,7 @@ module.exports = function(items, shouldStripTags){
 		feed.item({
 			title : item.title,
 			description : `${ reformat( item.bodyXML.substring(0, 100) ) }...`,
-			url : `${process.env.SERVER_ROOT}/feed/item/${item.uuid}`,
+			url : `https://www.ft.com/content/${item.uuid}`,
 			author : item.byline,
 			date : item.publishedDate,
 			custom_elements : [

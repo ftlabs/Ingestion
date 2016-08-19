@@ -3,6 +3,7 @@ const AWS = require('aws-sdk');
 const xml2js = require('xml2js');
 const fetch = require('node-fetch');
 const debug = require('debug')('absorb');
+const extract = require('./bin/lib/extract-uuid');
 
 const S3 = new AWS.S3();
 
@@ -33,58 +34,64 @@ function checkForData(){
 		.then(res => res.text())
 		.then(text => parseRSSFeed(text))
 		.then(feed => {
-			debug(feed);
+			// debug(feed);
 			feed.channel[0].item.forEach(item => {
 				// Let's check to see if we've already retrieved this item from SL
-				const itemUUID = item['ft:uid'];
+				const itemUUID = extract( item['guid'][0]._ )
+					.then(itemUUID => {
 
-				debug(itemUUID, item);
-
-				if(itemUUID === undefined){
-					return false;
-				}
-
-				S3.headObject({
-					Bucket : process.env.AWS_AUDIO_BUCKET,
-					Key : `${itemUUID}.mp3`
-				}, function (err, metadata) { 
-
-					if (err && err.code === 'NotFound') {
-						// We don't have that audio file, let's grab it
-						debug(`We don't have the audio for ${itemUUID}. Fetching from ${item.link}`);
-
-						if(process.env.ENVIRONMENT === "dev"){
-							item.link = 'http://127.0.0.1:3456/test.wav';
+						if(itemUUID === undefined){
+							return false;
 						}
 
-						fetch(item.link.toString())
-							.then(function(res) {
-								return res.buffer();
-							}).then(function(buffer) {
-								debug(buffer);
-								S3.putObject({
-									Bucket : process.env.AWS_AUDIO_BUCKET,
-									Key : `${itemUUID}.${process.env.SL_MEDIA_FORMAT || 'mp3'}`,
-									Body : buffer
-								}, function(err){
-									if(err){
+						const audioURL = item.enclosure[0]['$'].url;
+
+						debug(itemUUID);
+						debug(audioURL);
+
+						S3.headObject({
+							Bucket : process.env.AWS_AUDIO_BUCKET,
+							Key : `${itemUUID}.mp3`
+						}, function (err, metadata) { 
+
+							if (err && err.code === 'NotFound') {
+								// We don't have that audio file, let's grab it
+								debug(`We don't have the audio for ${itemUUID}. Fetching from ${item.link}`);
+								
+								debug(item);
+
+								fetch(audioURL)
+									.then(function(res) {
+										return res.buffer();
+									}).then(function(buffer) {
+										debug(buffer);
+										S3.putObject({
+											Bucket : process.env.AWS_AUDIO_BUCKET,
+											Key : `${itemUUID}.${process.env.SL_MEDIA_FORMAT || 'mp3'}`,
+											Body : buffer
+										}, function(err){
+											if(err){
+												debug(err);
+											}
+										})
+									})
+									.catch(err => {
 										debug(err);
-									}
-								})
-							})
-							.catch(err => {
-								debug(err);
-							})
-						;
+									})
+								;
 
-					} else if(err){
-						debug("An error occurred querying the S3 bucket", err);
-					} else {
-						debug(`The audio for ${itemUUID} is already in the S3 bucket`);
+							} else if(err){
+								debug("An error occurred querying the S3 bucket", err);
+							} else {
+								debug(`The audio for ${itemUUID} is already in the S3 bucket`);
 
-					}
+							}
 
-				});
+						});
+
+					})
+				;
+
 
 			});
 

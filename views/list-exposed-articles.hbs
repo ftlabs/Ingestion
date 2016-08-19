@@ -4,6 +4,7 @@
 	<thead>
 		<th>Content UUID</th>
 		<th>Headline</th>
+		<th class="recorded">Recorded?</th>
 		<th></th>
 	</thead>
 
@@ -13,7 +14,12 @@
 		
 			{{#each visibleDocs}}
 				<tr>
-					<td><a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a></td> <td>{{this.headline}}</td> <td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
+					<td>
+						<a target="_blank" href="https://www.ft.com/content/{{this.uuid}}">{{this.uuid}}</a>
+					</td> 
+					<td>{{this.headline}}</td>
+					<td>No</td>
+					<td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
 				</tr>
 			{{/each}}
 
