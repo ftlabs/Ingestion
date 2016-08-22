@@ -33,6 +33,17 @@ router.get('/', function(req, res, next){
 			}
 
 			debug(docs);
+
+			docs.sort(function(a, b){
+				if(a.madeAvailable < b.madeAvailable){
+					return 1;
+				} else if(a.madeAvailable > b.madeAvailable) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
+
 			res.render('list-exposed-articles', {
 				title : "Accessible Articles",
 				visibleDocs : Array.from(docs)
@@ -62,15 +73,24 @@ router.post('/add', (req, res, next) => {
 				}
 				const collection = db.collection('articles');
 
-				collection.updateOne({uuid : content.uuid}, {uuid : content.uuid, headline: content.title}, {upsert : true}, function(err, result){
-					if(err){
-						debug(err);
-						res.status(500);
-						res.end();
-					} else {
-						debug(content.uuid, 'has been exposed to 3rd parties');
-						res.redirect("/ft/add?success=true");
-					}
+				collection.updateOne(
+					{uuid : content.uuid},
+					{
+						uuid : content.uuid, 
+						headline: content.title,
+						publishedDate: content.publishedDate,
+						madeAvailable: Date.now() / 1000 | 0 // | 0 is like Math.floor()
+					}, 
+					{upsert : true},
+					function(err, result){
+						if(err){
+							debug(err);
+							res.status(500);
+							res.end();
+						} else {
+							debug(content.uuid, 'has been exposed to 3rd parties');
+							res.redirect("/ft/add?success=true");
+						}
 				});
 
 				db.close();

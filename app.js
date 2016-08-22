@@ -4,8 +4,22 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv').config();
 const hsts = require('hsts');
 const express_enforces_ssl = require('express-enforces-ssl');
+
+const hbs = require('hbs');
+
+hbs.registerHelper('unix', function(value) {
+  const d = new Date(value * 1000);
+  return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+});
+
+hbs.registerHelper('datestamp', function(value) {
+  console.log(value);
+  const d = new Date(value);
+  return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+});
 
 const app = express();
 
