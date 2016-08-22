@@ -4,7 +4,6 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const dotenv = require('dotenv').config();
 const hsts = require('hsts');
 const express_enforces_ssl = require('express-enforces-ssl');
 
