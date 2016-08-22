@@ -21,8 +21,37 @@ body {
   margin: 0;
 }
 
+.o-header-services__title ol{
+  display: inline-block;
+  list-style-type: none;
+}
+
+.o-header-services__title ol li{
+  display: inline-block;
+  color: white;
+  border-right: 1px solid white;
+  padding: 0 15px;
+}
+
+.o-header-services__title ol li:last-of-type{
+  border-right: 0px;
+}
+
+.o-header-services__title {
+  padding: 0 10px;
+}
+
 h1{
   width: 100%;
+}
+
+.o-header-services__title a{
+  text-decoration: none;
+  color: white;
+}
+
+.addArticleBtn{
+  margin-bottom: 1em;
 }
 
 table{
