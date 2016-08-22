@@ -18,6 +18,7 @@
     "dotenv": "^2.0.0",
     "express": "~4.13.4",
     "express-enforces-ssl": "^1.1.0",
+    "express-handlebars": "^3.0.0",
     "hbs": "~4.0.0",
     "hsts": "^1.0.0",
     "is-uuid": "^1.0.2",
