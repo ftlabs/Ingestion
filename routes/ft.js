@@ -6,6 +6,7 @@ const debug = require('debug')('routes:ft');
 
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
+const getContent = require('../bin/lib/content');
 const database = require('../bin/lib/database');
 const databaseError = require('../bin/lib/database-error');
 
@@ -37,7 +38,7 @@ router.get('/', function(req, res, next){
 		})
 		.catch(err => {
 			debug(err);
-			databaseError(res, "Error connecting to the database", err);
+			databaseError(res, "Error getting articles", err);
 		});
 	;
 
@@ -49,7 +50,27 @@ router.get('/add', function(req, res, next) {
 
 router.post('/add', (req, res, next) => {
 
-	const articleUUID = checkUUID(req.body.uuid)
+	checkUUID(req.body.uuid)
+		.then(UUID => getContent(UUID))
+		.then(content => {
+			return database.write({
+					uuid : content.uuid, 
+					headline: content.title,
+					publishedDate: content.publishedDate,
+					madeAvailable: Date.now() / 1000 | 0 // | 0 is like Math.floor()
+				}, process.env.AWS_DATA_TABLE)
+			;
+		}).then(results => {
+			debug(results);
+			res.redirect("/ft/add?success=true");
+		})
+		.catch(err => {
+			debug(err);
+			res.redirect("/ft/add?success=false");			
+		})
+	;
+
+	/*const articleUUID = checkUUID(req.body.uuid)
 		.then(function(content){
 
 			debug("UUID:", content.uuid);
@@ -89,7 +110,7 @@ router.post('/add', (req, res, next) => {
 		.catch(err => {
 			res.redirect("/ft/add?success=false");			
 		})
-	;
+	;*/
 
 
 });

@@ -7,7 +7,7 @@ module.exports = function(UUID){
 		.then(UUID => {
 			return getContent(UUID)
 				.then(res => {
-					return Promise.resolve(res);
+					return Promise.resolve(UUID);
 				})
 				.catch(err => {
 					return Promise.reject(err);
