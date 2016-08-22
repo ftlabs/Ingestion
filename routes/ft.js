@@ -6,6 +6,7 @@ const debug = require('debug')('routes:ft');
 
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
+const database = require('../bin/lib/database');
 const databaseError = require('../bin/lib/database-error');
 
 const mongoURL = process.env.MONGO_ENDPOINT;
@@ -14,27 +15,11 @@ router.use(S3O);
 
 router.get('/', function(req, res, next){
 
-	MongoClient.connect(mongoURL, function(err, db){
+	database.scan(process.env.AWS_DATA_TABLE)
+		.then(data => {
+			debug(data);
 
-		if(err){
-			databaseError(res, "Error connecting to the database", err);
-			return;
-		}
-
-		const articles = db.collection('articles');
-
-		articles.find({}).toArray(function(err, docs){
-
-			if(err){
-				debug(err);
-				res.status(500);
-				res.end();
-				return;
-			}
-
-			debug(docs);
-
-			docs.sort(function(a, b){
+			data.Items.sort((a, b) => {
 				if(a.madeAvailable < b.madeAvailable){
 					return 1;
 				} else if(a.madeAvailable > b.madeAvailable) {
@@ -42,16 +27,19 @@ router.get('/', function(req, res, next){
 				} else {
 					return 0;
 				}
-			});
+			})
 
 			res.render('list-exposed-articles', {
 				title : "Accessible Articles",
-				visibleDocs : Array.from(docs)
+				visibleDocs : Array.from(data.Items)
 			});
 
+		})
+		.catch(err => {
+			debug(err);
+			databaseError(res, "Error connecting to the database", err);
 		});
-
-	});
+	;
 
 });
 
