@@ -55,7 +55,7 @@ function readFromDatabase(item, table){
 
 }
 
-function scanDatabase(table){
+function scanDatabase(table, filter){
 
 	return new Promise( (resolve, reject) => {
 
@@ -65,11 +65,7 @@ function scanDatabase(table){
 			
 			Dynamo.scan({
 				TableName : table,
-				ScanFilter : {
-					available : {
-						ComparisonOperator : "NULL"
-					}
-				}
+				ScanFilter : filter
 			}, function(err, data){
 
 				if(err){

@@ -15,7 +15,7 @@ router.use(S3O);
 
 router.get('/', function(req, res){
 
-	database.scan(process.env.AWS_DATA_TABLE)
+	database.scan(process.env.AWS_DATA_TABLE, { available : { ComparisonOperator : "NULL" } } )
 		.then(data => {
 			debug(data);
 
@@ -103,6 +103,32 @@ router.get('/delete/:uuid', function(req, res){
 		.catch(err => {
 			debug(`An error occurred making ${articleUUID} no longer accessible to 3rd parties`, err);
 			res.redirect(`/ft?deleted=false`);
+		})
+	;
+
+});
+
+router.get('/logs', function(req, res){
+
+	database.scan(process.env.AWS_AUDIT_TABLE, {})
+		.then(results => {
+			debug(results);
+
+			const items = results.Items.sort((a, b) => {
+				if(a.time < b.time){
+					return 1;
+				} else if(a.time > b.time) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
+
+			res.render('logs', {
+				title : "Logs",
+				logs : items
+			});
+
 		})
 	;
 

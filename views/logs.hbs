@@ -1,0 +1,38 @@
+<h1>{{title}}</h1>
+
+<table class="o-table exposed-articles" data-o-component="o-table" >
+
+	<thead>
+		<th>User</th>
+		<th>Article</th>
+		<th>Action</th>
+		<th>Time</th>
+	</thead>
+
+	<tbody>
+
+		{{#if logs}}
+		
+			{{#each logs}}
+				<tr>
+					<td><strong>{{this.user}}</strong></td>
+					<td>
+						{{#if this.article}}
+							<a href="https://www.ft.com/content/{{this.article}}" target="_blank">{{this.article}}</a>
+						{{else}}
+							N/A
+						{{/if}}
+					</td>
+					<td>{{this.action}}</td>
+					<td>{{#unixWithTime this.time}}{{/unixWithTime}}</td>
+				</tr>
+			{{/each}}
+
+		{{else}}
+			<tr>
+				<td>No log entries...</td><td></td>
+			</tr>
+		{{/if}}
+	</tbody>
+
+</table>

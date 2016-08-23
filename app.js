@@ -14,6 +14,11 @@ hbs.registerHelper('unix', function(value) {
   return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
+hbs.registerHelper('unixWithTime', function(value) {
+  const d = new Date(value * 1000);
+  return `${d.getHours()}:${d.getMinutes()} ${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+});
+
 hbs.registerHelper('datestamp', function(value) {
   console.log(value);
   const d = new Date(value);
