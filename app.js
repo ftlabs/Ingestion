@@ -1,3 +1,4 @@
+const debug = require('debug')('app');
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -20,7 +21,7 @@ hbs.registerHelper('unixWithTime', function(value) {
 });
 
 hbs.registerHelper('datestamp', function(value) {
-  console.log(value);
+  debug(value);
   const d = new Date(value);
   return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });

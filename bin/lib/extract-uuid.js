@@ -1,4 +1,6 @@
 const isUUID = require('is-uuid');
+const debug = require('debug')('bin:lib:extract-uuid');
+
 module.exports = function(str){
 
 	let UUIDString = str;
@@ -8,7 +10,7 @@ module.exports = function(str){
 
 	UUIDString = matchedUUID ? matchedUUID[1] : null; 
 
-	console.log("UUID:", UUIDString);
+	debug("UUID:", UUIDString);
 
 	if(!UUIDString || !isUUID.anyNonNil(UUIDString)){
 		return Promise.reject("Not a valid UUID");

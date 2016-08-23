@@ -30,7 +30,10 @@ function parseRSSFeed(text){
 
 function checkForData(){
 	debug("Checking for data at", process.env.AUDIO_RSS_ENDPOINT);
-
+	audit({
+		user : "ABSORBER",
+		action : 'checkForAudioFiles'
+	});
 	fetch(process.env.AUDIO_RSS_ENDPOINT)
 		.then(res => res.text())
 		.then(text => parseRSSFeed(text))

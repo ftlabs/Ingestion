@@ -88,7 +88,7 @@ router.get('/delete/:uuid', function(req, res){
 	extractUUID(req.params.uuid)
 		.then(UUID => {
 			articleUUID = UUID;
-			console.log(UUID);
+			debug(UUID);
 			return database.remove({uuid : UUID}, process.env.AWS_DATA_TABLE)
 		})
 		.then(result => {
