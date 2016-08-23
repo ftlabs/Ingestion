@@ -4,6 +4,7 @@ const S3O = require('s3o-middleware');
 
 const debug = require('debug')('routes:ft');
 
+const audit = require('../bin/lib/audit');
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
 const getContent = require('../bin/lib/content');
@@ -42,14 +43,19 @@ router.get('/', function(req, res){
 
 });
 
-router.get('/add', function(req, res, next) {
+router.get('/add', function(req, res) {
 	res.render('expose-article', { title: 'Expose an article' });
 });
 
-router.post('/add', (req, res, next) => {
+router.post('/add', (req, res) => {
+
+	let articleUUID = undefined;
 
 	checkUUID(req.body.uuid)
-		.then(UUID => getContent(UUID))
+		.then(UUID => {
+			articleUUID = UUID;
+			return getContent(UUID);
+		})
 		.then(content => {
 			return database.write({
 					uuid : content.uuid, 
@@ -61,6 +67,11 @@ router.post('/add', (req, res, next) => {
 		}).then(results => {
 			debug(results);
 			res.redirect('/ft/add?success=true');
+			audit({
+				user : req.cookies.s3o_username,
+				action : 'addArticle',
+				article : articleUUID
+			});
 		})
 		.catch(err => {
 			debug(err);
@@ -72,21 +83,25 @@ router.post('/add', (req, res, next) => {
 
 router.get('/delete/:uuid', function(req, res){
 
-	let uuid = null;
-
+	let articleUUID = null;
+	
 	extractUUID(req.params.uuid)
 		.then(UUID => {
-			uuid = UUID;
+			articleUUID = UUID;
 			console.log(UUID);
 			return database.remove({uuid : UUID}, process.env.AWS_DATA_TABLE)
 		})
 		.then(result => {
-			debug(`${uuid} is no longer accessible to 3rd parties`, result);
+			debug(`${articleUUID} is no longer accessible to 3rd parties`, result);
 			res.redirect('/ft?deleted=true');
-
+			audit({
+				user : req.cookies.s3o_username,
+				action : 'deleteArticle',
+				article : articleUUID
+			});
 		})
 		.catch(err => {
-			debug(`An error occurred making ${uuid} no longer accessible to 3rd parties`, err);
+			debug(`An error occurred making ${articleUUID} no longer accessible to 3rd parties`, err);
 			res.redirect(`/ft?deleted=false`);
 		})
 	;
