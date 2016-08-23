@@ -112,8 +112,8 @@ router.get('/logs', function(req, res){
 
 	database.scan(process.env.AWS_AUDIT_TABLE, {})
 		.then(results => {
-			debug(results);
 
+			debug(results);
 			const items = results.Items.sort((a, b) => {
 				if(a.time < b.time){
 					return 1;

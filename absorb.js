@@ -4,6 +4,7 @@ const xml2js = require('xml2js');
 const fetch = require('node-fetch');
 const debug = require('debug')('absorb');
 const extract = require('./bin/lib/extract-uuid');
+const audit = require('./bin/lib/audit');
 
 const S3 = new AWS.S3();
 
@@ -73,6 +74,11 @@ function checkForData(){
 											if(err){
 												debug(err);
 											}
+											audit({
+												user : "ABSORBER",
+												action : 'getAudioFile',
+												article : itemUUID
+											});
 										})
 									})
 									.catch(err => {

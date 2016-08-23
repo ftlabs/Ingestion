@@ -29,7 +29,7 @@ router.get('/all', function(req, res){
 				.then(XML => {
 					res.send(XML);
 					audit({
-						user : "UNKNOWN",
+						user : req.cookies.s3o_username || "UNKNOWN",
 						action : 'accessFeed'
 					});
 				})
