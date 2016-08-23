@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const S3O = require('s3o-middleware');
-const MongoClient = require('mongodb').MongoClient;
+
 const debug = require('debug')('routes:ft');
 
 const extractUUID = require('../bin/lib/extract-uuid');
@@ -10,11 +10,9 @@ const getContent = require('../bin/lib/content');
 const database = require('../bin/lib/database');
 const databaseError = require('../bin/lib/database-error');
 
-const mongoURL = process.env.MONGO_ENDPOINT;
-
 router.use(S3O);
 
-router.get('/', function(req, res, next){
+router.get('/', function(req, res){
 
 	database.scan(process.env.AWS_DATA_TABLE)
 		.then(data => {
@@ -31,14 +29,14 @@ router.get('/', function(req, res, next){
 			})
 
 			res.render('list-exposed-articles', {
-				title : "Accessible Articles",
+				title : 'Accessible Articles',
 				visibleDocs : Array.from(data.Items)
 			});
 
 		})
 		.catch(err => {
 			debug(err);
-			databaseError(res, "Error getting articles", err);
+			databaseError(res, 'Error getting articles', err);
 		});
 	;
 
@@ -62,17 +60,17 @@ router.post('/add', (req, res, next) => {
 			;
 		}).then(results => {
 			debug(results);
-			res.redirect("/ft/add?success=true");
+			res.redirect('/ft/add?success=true');
 		})
 		.catch(err => {
 			debug(err);
-			res.redirect("/ft/add?success=false");			
+			res.redirect('/ft/add?success=false');			
 		})
 	;
 
 });
 
-router.get('/delete/:uuid', function(req, res, next){
+router.get('/delete/:uuid', function(req, res){
 
 	let uuid = null;
 
@@ -83,8 +81,8 @@ router.get('/delete/:uuid', function(req, res, next){
 			return database.remove({uuid : UUID}, process.env.AWS_DATA_TABLE)
 		})
 		.then(result => {
-			debug(`${uuid} is no longer accessible to 3rd parties`);
-			res.redirect(`/ft?deleted=true`);
+			debug(`${uuid} is no longer accessible to 3rd parties`, result);
+			res.redirect('/ft?deleted=true');
 
 		})
 		.catch(err => {
