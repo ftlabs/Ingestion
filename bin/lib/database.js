@@ -19,13 +19,13 @@ function writeToDatabase(item, table){
 
 			if(err){
 				reject(err);
-			} else {
+			} else {				
 				resolve(result);
 			}
 
 		});
 
-	});
+	})
 
 }
 
@@ -35,20 +35,21 @@ function readFromDatabase(item, table){
 
 		if(table === undefined || table === null){
 			reject("'table' argument is undefined or null");
-			return;
-		}
+		} else {
 
-		Dynamo.getItem({
-			TableName : table,
-			Key : item
-		}, function(err, data) {
-			
-			if (err) {
-				reject(err);
-			} else {
-				resolve(data);
-			}
-		});
+			Dynamo.getItem({
+				TableName : table,
+				Key : item
+			}, function(err, data) {
+				
+				if (err) {
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			});
+
+		}
 	
 	});
 
@@ -60,28 +61,48 @@ function scanDatabase(table){
 
 		if(table === undefined || table === null){
 			reject("'table' argument is undefined or null");
-			return;
+		} else {
+			
+			Dynamo.scan({
+				TableName : table,
+				ScanFilter : {
+					available : {
+						ComparisonOperator : "NULL"
+					}
+				}
+			}, function(err, data){
+
+				if(err){
+					reject(err);
+				} else {
+					resolve(data);
+				}
+
+			})
+
 		}
-
-		Dynamo.scan({
-			TableName : table
-		}, function(err, data){
-
-			if(err){
-				reject(err);
-			} else {
-				resolve(data);
-			}
-
-		})
 
 	});
 
+}
+
+function removeItemFromDatabase(item, table){
+
+	return Promise.resolve()
+		.then(function(){
+			if(table === undefined || table === null){
+				throw "'table' argument is undefined or null";
+			}
+			item.available = false;
+			return writeToDatabase(item, table);
+		})
+	;
 
 }
 
 module.exports = {
 	write : writeToDatabase,
 	read : readFromDatabase,
-	scan : scanDatabase
+	scan : scanDatabase,
+	remove : removeItemFromDatabase
 };

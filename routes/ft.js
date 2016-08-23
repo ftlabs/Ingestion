@@ -70,89 +70,28 @@ router.post('/add', (req, res, next) => {
 		})
 	;
 
-	/*const articleUUID = checkUUID(req.body.uuid)
-		.then(function(content){
-
-			debug("UUID:", content.uuid);
-			MongoClient.connect(mongoURL, function(err, db) {
-
-				if(err){
-					databaseError(res, "Error connecting to the database", err);
-					return;
-				}
-				const collection = db.collection('articles');
-
-				collection.updateOne(
-					{uuid : content.uuid},
-					{
-						uuid : content.uuid, 
-						headline: content.title,
-						publishedDate: content.publishedDate,
-						madeAvailable: Date.now() / 1000 | 0 // | 0 is like Math.floor()
-					}, 
-					{upsert : true},
-					function(err, result){
-						if(err){
-							debug(err);
-							res.status(500);
-							res.end();
-						} else {
-							debug(content.uuid, 'has been exposed to 3rd parties');
-							res.redirect("/ft/add?success=true");
-						}
-				});
-
-				db.close();
-
-			});
-
-		})
-		.catch(err => {
-			res.redirect("/ft/add?success=false");			
-		})
-	;*/
-
-
 });
 
 router.get('/delete/:uuid', function(req, res, next){
 
-	const articleUUID = extractUUID(req.params.uuid)
+	let uuid = null;
+
+	extractUUID(req.params.uuid)
 		.then(UUID => {
-			
-			MongoClient.connect(mongoURL, function(err, db){
-
-				if(err){
-					databaseError(res, "Error connecting to the database", err);
-					return;
-				}
-
-				const collection = db.collection('articles');
-				collection.deleteOne({
-					uuid : UUID
-				}, function(err, result){
-
-					if(err){
-						debug(err);
-						res.status(500);
-						res.send("An error occurred deleting that article from the database");
-					} else {
-						debug(`Article ${UUID} is no longer visible to 3rd parties`);
-						res.redirect(`/ft?deleted=true&uuid=${UUID}`);
-					}
-
-				})
-
-				db.close();
-				
-			});
+			uuid = UUID;
+			console.log(UUID);
+			return database.remove({uuid : UUID}, process.env.AWS_DATA_TABLE)
+		})
+		.then(result => {
+			debug(`${uuid} is no longer accessible to 3rd parties`);
+			res.redirect(`/ft?deleted=true`);
 
 		})
 		.catch(err => {
-			res.redirect(`/ft?deleted=false&uuid=${UUID}`);
+			debug(`An error occurred making ${uuid} no longer accessible to 3rd parties`, err);
+			res.redirect(`/ft?deleted=false`);
 		})
 	;
-
 
 });
 
