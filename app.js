@@ -1,3 +1,4 @@
+const debug = require('debug')('app');
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -14,8 +15,13 @@ hbs.registerHelper('unix', function(value) {
   return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
+hbs.registerHelper('unixWithTime', function(value) {
+  const d = new Date(value * 1000);
+  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+});
+
 hbs.registerHelper('datestamp', function(value) {
-  console.log(value);
+  debug(value);
   const d = new Date(value);
   return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });

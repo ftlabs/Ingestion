@@ -4,6 +4,7 @@ const xml2js = require('xml2js');
 const fetch = require('node-fetch');
 const debug = require('debug')('absorb');
 const extract = require('./bin/lib/extract-uuid');
+const audit = require('./bin/lib/audit');
 
 const S3 = new AWS.S3();
 
@@ -29,7 +30,10 @@ function parseRSSFeed(text){
 
 function checkForData(){
 	debug("Checking for data at", process.env.AUDIO_RSS_ENDPOINT);
-
+	audit({
+		user : "ABSORBER",
+		action : 'checkForAudioFiles'
+	});
 	fetch(process.env.AUDIO_RSS_ENDPOINT)
 		.then(res => res.text())
 		.then(text => parseRSSFeed(text))
@@ -73,6 +77,11 @@ function checkForData(){
 											if(err){
 												debug(err);
 											}
+											audit({
+												user : "ABSORBER",
+												action : 'getAudioFile',
+												article : itemUUID
+											});
 										})
 									})
 									.catch(err => {
