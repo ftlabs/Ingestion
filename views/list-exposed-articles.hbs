@@ -23,7 +23,7 @@
 					<td>{{this.headline}}</td>
 					<td>{{#datestamp this.publishedDate}}{{/datestamp}}</td>
 					<td>{{#unix this.madeAvailable}}{{/unix}}</td>
-					<td>No</td>
+					<td>{{this.recorded}}</td>
 					<td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
 				</tr>
 			{{/each}}

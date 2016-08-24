@@ -8,6 +8,7 @@ const errorReporting = require('../bin/lib/error-reporting');
 const audit = require('../bin/lib/audit');
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
+const checkBucket = require('../bin/lib/check-bucket');
 const getContent = require('../bin/lib/content');
 const database = require('../bin/lib/database');
 const databaseError = require('../bin/lib/database-error');
@@ -30,10 +31,30 @@ router.get('/', function(req, res){
 				}
 			})
 
-			res.render('list-exposed-articles', {
-				title : 'Accessible Articles',
-				visibleDocs : Array.from(data.Items)
+			const isRecorded = data.Items.map(item => {
+
+				return checkBucket(item.uuid);
+
 			});
+
+			Promise.all(isRecorded)
+				.then(vals => {
+					
+					vals.forEach( (val, idx) => {
+						data.Items[idx].recorded = val === true ? "Yes" : "No";
+					});
+
+					res.render('list-exposed-articles', {
+						title : 'Accessible Articles',
+						visibleDocs : Array.from(data.Items)
+					});
+
+				})
+				.catch(err => {
+					debug(err);
+				})
+			;
+
 
 		})
 		.catch(err => {
