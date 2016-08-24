@@ -25,6 +25,7 @@
     "mongodb": "^2.2.5",
     "morgan": "~1.7.0",
     "node-fetch": "^1.6.0",
+    "raven": "^0.12.1",
     "redis": "^2.6.2",
     "rss": "^1.2.1",
     "s3o-middleware": "^1.7.0",

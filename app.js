@@ -7,22 +7,23 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const hsts = require('hsts');
 const express_enforces_ssl = require('express-enforces-ssl');
+const padTime = require('./bin/lib/pad-time');
 
 const hbs = require('hbs');
 
 hbs.registerHelper('unix', function(value) {
-  const d = new Date(value * 1000);
+  const d = padTime(new Date(value * 1000));
   return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
 hbs.registerHelper('unixWithTime', function(value) {
-  const d = new Date(value * 1000);
+  const d = padTime(new Date(value * 1000));
   return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
 hbs.registerHelper('datestamp', function(value) {
   debug(value);
-  const d = new Date(value);
+  const d = padTime(new Date(value));
   return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
