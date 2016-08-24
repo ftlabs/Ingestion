@@ -4,6 +4,7 @@ const S3O = require('s3o-middleware');
 
 const debug = require('debug')('routes:ft');
 
+const errorReporting = require('../bin/lib/error-reporting');
 const audit = require('../bin/lib/audit');
 const extractUUID = require('../bin/lib/extract-uuid');
 const checkUUID = require('../bin/lib/check-uuid');
@@ -37,6 +38,7 @@ router.get('/', function(req, res){
 		})
 		.catch(err => {
 			debug(err);
+			errorReporting(err);
 			databaseError(res, 'Error getting articles', err);
 		});
 	;
@@ -75,6 +77,7 @@ router.post('/add', (req, res) => {
 		})
 		.catch(err => {
 			debug(err);
+			errorReporting(err);
 			res.redirect('/ft/add?success=false');			
 		})
 	;
@@ -102,6 +105,7 @@ router.get('/delete/:uuid', function(req, res){
 		})
 		.catch(err => {
 			debug(`An error occurred making ${articleUUID} no longer accessible to 3rd parties`, err);
+			errorReporting(err);
 			res.redirect(`/ft?deleted=false`);
 		})
 	;
@@ -130,6 +134,11 @@ router.get('/logs', function(req, res){
 			});
 
 		})
+		.catch(err => {
+			debug(`An error occurred trying to retrieve the logs`, err);			
+			errorReporting(err);
+			databaseError(res, 'Error getting logs', err);
+		});
 	;
 
 });
