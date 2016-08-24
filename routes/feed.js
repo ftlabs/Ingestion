@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const debug = require('debug')('routes:partner');
 
+const errorReporting = require('../bin/lib/error-reporting');
 const audit = require('../bin/lib/audit');
 const getContent = require('../bin/lib/content');
 const rssify = require('../bin/lib/rssify');
@@ -35,6 +36,7 @@ router.get('/all', function(req, res){
 				})
 				.catch(err => {
 					debug('Error', err);
+					errorReporting(err);
 					res.status(500);
 					res.send("An error occurred");
 				})
