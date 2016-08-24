@@ -18,7 +18,7 @@ router.get('/all', function(req, res){
 
 	const noTags = req.query.notags === "true";
 
-	database.scan(process.env.AWS_DATA_TABLE)
+	database.scan(process.env.AWS_DATA_TABLE, { available : { ComparisonOperator : "NULL" } })
 		.then(data => {
 
 			const articles = data.Items.map(entry => {

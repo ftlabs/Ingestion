@@ -57,6 +57,8 @@ function readFromDatabase(item, table){
 
 function scanDatabase(table, filter){
 
+	filter = filter || {};
+
 	return new Promise( (resolve, reject) => {
 
 		if(table === undefined || table === null){
