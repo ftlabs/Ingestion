@@ -11,7 +11,7 @@ The app, and all of its dependencies will now have been installed.
 
 ## Running
 
-To run the app, run `npm run start` from your CLI. The app will now be accessible at [localhost:3000](http://localhost:3000). The port number can be set by creating a .env file in the root folder of the project and add `PORT[NUMBER]` as an entry.
+To run the app, config the environment values (see below), run `npm run start` from your CLI. The app will now be accessible at [localhost:3000](http://localhost:3000), where 3000 is the default which can be overridden by specifying the environment value PORT.
 
 ## Aspects
 This app performs a number of functions. It
@@ -23,7 +23,7 @@ This app performs a number of functions. It
 ## Configuration
 
 ### Environment Variables
-Aspects of Ingestion can be configured with environment variables. These can be inluded using a [dotenv file](https://www.npmjs.com/package/dotenv), or as normal system variales.
+Aspects of Ingestion can be configured with environment variables. These can be included using a [dotenv file](https://www.npmjs.com/package/dotenv), or as normal system variables.
 
 ***Note**: A .env file is not required to run the app, but some of the variables are.*
 
