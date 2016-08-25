@@ -27,7 +27,7 @@ Aspects of Ingestion can be configured with environment variables. These can be 
 
 ***Note**: A .env file is not required to run the app, but some of the variables are.*
 
-#### Required Variables
+### Required Variables
 
 ##### CAPI_KEY
 An FT Content API key to enable access to FT Articles. If you don't have an API key, you should be able to get one by talking to someone on the UPP team.
@@ -47,7 +47,7 @@ The name of the DynamoDB database where the UUIDs of exposed articles are stored
 ##### AWS_AUDIT_TABLE
 The name of the DynamoDB database where the logs of actions and access to Ingestion and its content is stored
 
-#### Optional Variables
+### Optional Variables
 
 ##### BASIC_AUTH_USER
 The RSS feed can be restricted with basic authentication. This value is the username that a user will have to enter to access the service.
@@ -71,7 +71,7 @@ The name of the AWS S3 bucket that audio files acquired from our partners will b
 The file format of the 3rd party audio files that we absorb
 
 ##### AWS_REGION
-The region of the AWS services that we're using.
+The region of the AWS services that we're using. Defaults to 'us-west-2' if no option is passed.
 
 ##### SENTRY_DSN
 The DSN for Sentry (for alerts when things go wrong)
