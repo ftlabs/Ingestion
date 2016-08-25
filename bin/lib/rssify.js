@@ -18,13 +18,10 @@ module.exports = function(items, shouldStripTags){
 
 		feed.item({
 			title : item.title,
-			description : `${ reformat( item.bodyXML.substring(0, 100) ) }...`,
+			description : shouldStripTags === true ? reformat (item.bodyXML) : item.bodyXML,
 			url : `https://www.ft.com/content/${item.uuid}`,
 			author : item.byline,
-			date : item.publishedDate,
-			custom_elements : [
-				{content : shouldStripTags === true ? reformat (item.bodyXML) : item.bodyXML }
-			]
+			date : item.publishedDate
 		});
 
 	});
