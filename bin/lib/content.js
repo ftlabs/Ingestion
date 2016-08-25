@@ -11,9 +11,9 @@ module.exports = function(articleUUID){
 			if(res.status !== 200){
 
 				if(res.status === 404){
-					throw "Could not find content " + articleUUID;
+					throw `Could not find content ${articleUUID}`;
 				} else {
-					throw "An error occurred retrieving that article";
+					throw `An error occurred retrieving ${articleUUID}`;
 				}
 
 			} else {
