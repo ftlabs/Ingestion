@@ -47,4 +47,61 @@ router.get('/all', function(req, res){
 
 });
 
+const cheerio = require('cheerio');
+const fetch = require('node-fetch');
+const extractUUID = require('../bin/lib/extract-uuid');
+
+const firstFTURL = "https://www.ft.com/firstft";
+
+router.get('/firstft', function(req, res){
+	// res.end();
+	
+	const noTags = req.query.notags === "true";
+
+	fetch(firstFTURL)
+		.then(res => res.text())
+		.then(function(HTML){
+
+			const parsedHTML = cheerio.load(HTML, {
+				normalizeWhitespace: true,
+				xmlMode: true
+			});
+
+			const firstFTPageUUID = Array.from(parsedHTML('#stream .stream-item .card__title-link'))[0].attribs.href.replace('/content/', '');
+
+			return firstFTPageUUID;
+
+		})
+		.then(UUID => getContent(UUID))
+		.then(firstFTPageContent => {
+			console.log(firstFTPageContent);
+
+			const parsedContent = cheerio.load(firstFTPageContent.bodyXML, {
+				normalizeWhitespace: true,
+				xmlMode: true
+			});
+
+			const UUIDs = Array.from(parsedContent('ft-content')).map(link => extractUUID(link.attribs.url));
+
+			return Promise.all(UUIDs)
+				.then(contentUUIDs => {
+					const articles = contentUUIDs.map(uuid => {
+						return getContent(uuid);
+					});
+					return Promise.all(articles);
+				})
+			;
+
+		})
+		.then(articles => rssify(articles, noTags))
+		.then(XML => {
+			res.send(XML);			
+		})
+		.catch(err => {
+			console.log(err);
+		})
+	;
+
+});
+
 module.exports = router;
