@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 const debug = require('debug')('absorb');
 const extract = require('./bin/lib/extract-uuid');
 const audit = require('./bin/lib/audit');
+const database = require('./bin/lib/database');
 
 const S3 = new AWS.S3();
 
@@ -28,6 +29,23 @@ function parseRSSFeed(text){
 
 }
 
+function seperateQueryParams(queryString){
+
+	const data = {};
+
+	queryString = queryString.split('?')[1].split('&').forEach(parameter => {
+		const keyAndValue = parameter.split('=');
+
+		if(keyAndValue[1] !== ""){
+			data[keyAndValue[0]] = decodeURIComponent(keyAndValue[1]);
+		}
+
+	});
+
+	return data;
+
+}
+
 function checkForData(){
 	debug("Checking for data at", process.env.AUDIO_RSS_ENDPOINT);
 	audit({
@@ -38,7 +56,7 @@ function checkForData(){
 		.then(res => res.text())
 		.then(text => parseRSSFeed(text))
 		.then(feed => {
-			// debug(feed);
+			debug(feed);
 			feed.channel[0].item.forEach(item => {
 				// Let's check to see if we've already retrieved this item from SL
 				const itemUUID = extract( item['guid'][0]._ )
@@ -52,6 +70,30 @@ function checkForData(){
 
 						debug(itemUUID);
 						debug(audioURL);
+
+						database.read({ uuid : itemUUID }, process.env.AWS_METADATA_TABLE)
+							.then(item => {
+
+								debug("Item in DynamoDB", item);
+								if(Object.keys(item).length < 1){
+									
+									debug(`Item ${itemUUID} has no meta data in database. Adding...`);
+
+									const metadata = seperateQueryParams(audioURL);
+									metadata.uuid = itemUUID;
+
+									database.write(metadata, process.env.AWS_METADATA_TABLE)
+										.catch(err => {
+											debug("An error occurred when writing audio meta data to the metadata table.", err, metadata);
+										})
+									;
+								}
+
+							})
+							.catch(err => {
+								debug(`Database read (${process.env.AWS_METADATA_TABLE}) error for ${itemUUID}`, err);
+							})
+						;
 
 						S3.headObject({
 							Bucket : process.env.AWS_AUDIO_BUCKET,
