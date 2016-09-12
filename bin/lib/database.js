@@ -37,7 +37,7 @@ function readFromDatabase(item, table){
 			reject("'table' argument is undefined or null");
 		} else {
 
-			Dynamo.getItem({
+			Dynamo.get({
 				TableName : table,
 				Key : item
 			}, function(err, data) {
