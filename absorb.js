@@ -74,7 +74,7 @@ function checkForData(){
 						database.read({ uuid : itemUUID }, process.env.AWS_METADATA_TABLE)
 							.then(item => {
 
-								debug("Item in DynamoDB", item);
+								debug(`Item ${itemUUID} in DynamoDB`, item);
 								if(Object.keys(item).length < 1){
 									
 									debug(`Item ${itemUUID} has no meta data in database. Adding...`);
