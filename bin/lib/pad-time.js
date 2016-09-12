@@ -14,7 +14,7 @@ module.exports = function(t){
   a.getHours = () => { return zero(t.getHours()); };
 
   a.getDate = () => { return zero(t.getDate()); };
-  a.getMonth = () => { return zero(t.getMonth()); };
+  a.getMonth = () => { return zero(t.getMonth() + 1); };
   a.getFullYear = () => { return zero(t.getFullYear()); };
 
   return a;

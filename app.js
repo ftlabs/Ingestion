@@ -13,18 +13,18 @@ const hbs = require('hbs');
 
 hbs.registerHelper('unix', function(value) {
   const d = padTime(new Date(value * 1000));
-  return `${d.getDate()}/${ parseInt( d.getMonth() ) + 1}/${d.getFullYear()}`;
+  return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
 hbs.registerHelper('unixWithTime', function(value) {
   const d = padTime(new Date(value * 1000));
-  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${ parseInt( d.getMonth() ) + 1}/${d.getFullYear()}`;
+  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${ d.getMonth()}/${d.getFullYear()}`;
 });
 
 hbs.registerHelper('datestamp', function(value) {
   debug(value);
   const d = padTime(new Date(value));
-  return `${d.getDate()}/${ parseInt( d.getMonth() ) + 1}/${d.getFullYear()}`;
+  return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
 const app = express();
