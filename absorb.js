@@ -81,6 +81,7 @@ function checkForData(){
 
 									const metadata = seperateQueryParams(audioURL);
 									metadata.uuid = itemUUID;
+									metadata.originalURL = audioURL.split('?')[0];
 
 									database.write(metadata, process.env.AWS_METADATA_TABLE)
 										.catch(err => {
