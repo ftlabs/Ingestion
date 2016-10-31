@@ -114,7 +114,8 @@ function checkForData(){
 										S3.putObject({
 											Bucket : process.env.AWS_AUDIO_BUCKET,
 											Key : `${itemUUID}.${process.env.SL_MEDIA_FORMAT || 'mp3'}`,
-											Body : buffer
+											Body : buffer,
+											ACL : 'public-read'
 										}, function(err){
 											if(err){
 												debug(err);

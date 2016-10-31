@@ -41,7 +41,12 @@ router.get('/', function(req, res){
 				.then(vals => {
 					
 					vals.forEach( (val, idx) => {
-						data.Items[idx].recorded = val === true ? "Yes" : "No";
+						let item = data.Items[idx];
+						item.recorded = val === true ? "Yes" : "No";
+						if(val === true){
+							data.Items[idx].publicURL = `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_AUDIO_BUCKET}/${item.uuid}.${process.env.SL_MEDIA_FORMAT}`;
+						}
+
 					});
 
 					res.render('list-exposed-articles', {
