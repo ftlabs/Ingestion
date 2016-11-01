@@ -3,10 +3,12 @@ const AWS = require('aws-sdk');
 const xml2js = require('xml2js');
 const fetch = require('node-fetch');
 const debug = require('debug')('absorb');
+
 const extract = require('./bin/lib/extract-uuid');
 const audit = require('./bin/lib/audit');
 const database = require('./bin/lib/database');
 const mail = require('./bin/lib/mailer');
+const generateS3PublicURL = require('./bin/lib/get-s3-public-url');
 
 const S3 = new AWS.S3();
 
@@ -121,7 +123,7 @@ function checkForData(){
 											if(err){
 												debug(err);
 											}
-											mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${metadata.originalURL}.`);
+											mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);											
 											audit({
 												user : "ABSORBER",
 												action : 'getAudioFile',
