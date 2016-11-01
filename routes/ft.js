@@ -12,6 +12,7 @@ const checkBucket = require('../bin/lib/check-bucket');
 const getContent = require('../bin/lib/content');
 const database = require('../bin/lib/database');
 const databaseError = require('../bin/lib/database-error');
+const generateS3PublicURL = require('../bin/lib/get-s3-public-url');
 
 router.use(S3O);
 
@@ -44,7 +45,7 @@ router.get('/', function(req, res){
 						let item = data.Items[idx];
 						item.recorded = val === true ? "Yes" : "No";
 						if(val === true){
-							data.Items[idx].publicURL = `https://s3-${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_AUDIO_BUCKET}/${item.uuid}.${process.env.SL_MEDIA_FORMAT}`;
+							data.Items[idx].publicURL = generateS3PublicURL(item.uuid);							
 						}
 
 					});
