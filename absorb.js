@@ -6,6 +6,7 @@ const debug = require('debug')('absorb');
 const extract = require('./bin/lib/extract-uuid');
 const audit = require('./bin/lib/audit');
 const database = require('./bin/lib/database');
+const mail = require('./bin/lib/mailer');
 
 const S3 = new AWS.S3();
 
@@ -67,6 +68,9 @@ function checkForData(){
 						}
 
 						const audioURL = item.enclosure[0]['$'].url;
+						const metadata = seperateQueryParams(audioURL);
+						metadata.uuid = itemUUID;
+						metadata.originalURL = audioURL.split('?')[0];
 
 						debug(itemUUID);
 						debug(audioURL);
@@ -78,10 +82,6 @@ function checkForData(){
 								if(Object.keys(item).length < 1){
 									
 									debug(`Item ${itemUUID} has no meta data in database. Adding...`);
-
-									const metadata = seperateQueryParams(audioURL);
-									metadata.uuid = itemUUID;
-									metadata.originalURL = audioURL.split('?')[0];
 
 									database.write(metadata, process.env.AWS_METADATA_TABLE)
 										.catch(err => {
@@ -99,7 +99,7 @@ function checkForData(){
 						S3.headObject({
 							Bucket : process.env.AWS_AUDIO_BUCKET,
 							Key : `${itemUUID}.mp3`
-						}, function (err, metadata) { 
+						}, function (err) { 
 
 							if (err && err.code === 'NotFound') {
 								// We don't have that audio file, let's grab it
@@ -121,6 +121,7 @@ function checkForData(){
 											if(err){
 												debug(err);
 											}
+											mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${metadata.originalURL}.`);
 											audit({
 												user : "ABSORBER",
 												action : 'getAudioFile',
