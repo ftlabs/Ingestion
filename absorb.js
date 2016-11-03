@@ -123,7 +123,7 @@ function checkForData(){
 											if(err){
 												debug(err);
 											}
-											mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);											
+											mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);
 											audit({
 												user : "ABSORBER",
 												action : 'getAudioFile',
