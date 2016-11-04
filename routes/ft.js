@@ -119,7 +119,13 @@ router.get('/delete/:uuid', function(req, res){
 		.then(UUID => {
 			articleUUID = UUID;
 			debug(UUID);
-			return database.remove({uuid : UUID}, process.env.AWS_DATA_TABLE)
+			database.read({uuid : UUID}, process.env.AWS_DATA_TABLE)
+				.then(result => {
+					const itemToRemove = result.Item;
+					itemToRemove.available = false;
+					return database.write(itemToRemove, process.env.AWS_DATA_TABLE);
+				})
+			;
 		})
 		.then(result => {
 			debug(`${articleUUID} is no longer accessible to 3rd parties`, result);
