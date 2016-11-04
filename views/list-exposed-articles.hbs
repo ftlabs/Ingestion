@@ -8,6 +8,7 @@
 		<th>Published (DD-MM-YYYY)</th>
 		<th>Exposed (DD-MM-YYYY)</th>
 		<th class="recorded">Recorded?</th>
+		<th>Turnaround time</th>
 		<th></th>
 	</thead>
 
@@ -24,6 +25,7 @@
 					<td>{{#datestamp this.publishedDate}}{{/datestamp}}</td>
 					<td>{{#unix this.madeAvailable}}{{/unix}}</td>
 					<td>{{#if this.publicURL}}<a href="{{this.publicURL}}">{{this.recorded}}</a>{{else}} {{this.recorded}} {{/if}} </td>
+					<td>{{this.turnaround}}</td>
 					<td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
 				</tr>
 			{{/each}}
