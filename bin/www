@@ -10,8 +10,8 @@ var debug = require('debug')('Ingestion:server');
 var http = require('http');
 
 const absorber = require('../absorb');
-// Poll every 1/2 hour
-absorber.poll((1000 * 60) * 30, true);
+// Poll every 2 mins
+absorber.poll((1000 * 60) * 2, true);
 
 /**
  * Get port from environment and store in Express.

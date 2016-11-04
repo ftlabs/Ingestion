@@ -62,7 +62,7 @@ function checkForData(){
 			debug(feed);
 			feed.channel[0].item.forEach(item => {
 				// Let's check to see if we've already retrieved this item from SL
-				const itemUUID = extract( item['guid'][0]._ )
+				extract( item['guid'][0]._ )
 					.then(itemUUID => {
 
 						if(itemUUID === undefined){
@@ -80,12 +80,40 @@ function checkForData(){
 						database.read({ uuid : itemUUID }, process.env.AWS_METADATA_TABLE)
 							.then(item => {
 
-								debug(`Item ${itemUUID} in DynamoDB`, item);
 								if(Object.keys(item).length < 1){
 									
-									debug(`Item ${itemUUID} has no meta data in database. Adding...`);
+									debug(`Item ${itemUUID} has no meta data in database. Adding...`, metadata);
 
 									database.write(metadata, process.env.AWS_METADATA_TABLE)
+										.then(function(){
+											debug(`Item ${itemUUID} in DynamoDB`, metadata);
+								
+											database.read({uuid : itemUUID}, process.env.AWS_DATA_TABLE)
+												.then(d => {
+
+													if(d.Item !== undefined){
+														
+														const madeAvailable = d.Item.madeAvailable;
+														const voiced = new Date(metadata['date-voiced']) / 1000;
+														
+														if(voiced - madeAvailable > 0){
+														
+															debug(`Date voiced: ${voiced} Made Available: ${madeAvailable} Turnaround: ${voiced - madeAvailable} seconds`);
+															d.Item.turnaround = voiced - madeAvailable;
+															database.write(d.Item, process.env.AWS_DATA_TABLE)
+														
+														}
+
+													}
+
+
+												})
+												.catch(err => {
+													debug(`An error occurred writing the turnaround time for ${itemUUID}`, err);
+												})
+											;
+
+										})
 										.catch(err => {
 											debug("An error occurred when writing audio meta data to the metadata table.", err, metadata);
 										})
@@ -123,7 +151,11 @@ function checkForData(){
 											if(err){
 												debug(err);
 											}
-											mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);
+
+											if(process.env.ENVIRONMENT !== 'dev'){
+												mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);
+											}
+
 											audit({
 												user : "ABSORBER",
 												action : 'getAudioFile',

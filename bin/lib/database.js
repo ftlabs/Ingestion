@@ -84,23 +84,8 @@ function scanDatabase(table, filter){
 
 }
 
-function removeItemFromDatabase(item, table){
-
-	return Promise.resolve()
-		.then(function(){
-			if(table === undefined || table === null){
-				throw "'table' argument is undefined or null";
-			}
-			item.available = false;
-			return writeToDatabase(item, table);
-		})
-	;
-
-}
-
 module.exports = {
 	write : writeToDatabase,
 	read : readFromDatabase,
-	scan : scanDatabase,
-	remove : removeItemFromDatabase
+	scan : scanDatabase
 };
