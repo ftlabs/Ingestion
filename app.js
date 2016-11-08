@@ -12,25 +12,32 @@ const padTime = require('./bin/lib/pad-time');
 const hbs = require('hbs');
 
 hbs.registerHelper('unix', function(value) {
-  const d = padTime(new Date(value * 1000));
-  return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+	const d = padTime(new Date(value * 1000));
+	return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
 });
 
 hbs.registerHelper('unixWithTime', function(value) {
-  const d = padTime(new Date(value * 1000));
-  return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${ d.getMonth()}/${d.getFullYear()}`;
+	const d = padTime(new Date(value * 1000));
+	return `${d.getDate()}/${ d.getMonth()}/${d.getFullYear()} <strong>${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}</strong>`;
 });
 
 hbs.registerHelper('datestamp', function(value) {
-  debug(value);
-  const d = padTime(new Date(value));
-  return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+	debug(value);
+	const d = padTime(new Date(value));
+	return `${d.getDate()}/${d.getMonth()}/${d.getFullYear()}`;
+});
+
+hbs.registerHelper('secondsToHumanTime', function(value){
+	if(value === "" || value === undefined || value === null || value === 0){
+		return "";
+	}
+	return `${parseInt( value / 86164 ) % 365} days, ${parseInt( value / 3600 ) % 24} hours, ${parseInt( value / 60 ) % 60} minutes and ${value % 24} seconds`;
 });
 
 const app = express();
 
 if(process.env.ENVIRONMENT !== "dev"){
-  app.use(hsts({ maxAge: 7776000000, force: true })); // 90 
+  app.use(hsts({ maxAge: 7776000000, force: true })); // 90
   app.enable('trust proxy');
   app.use(express_enforces_ssl());
 }

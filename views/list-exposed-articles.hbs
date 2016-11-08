@@ -23,9 +23,9 @@
 					</td> 
 					<td>{{this.headline}}</td>
 					<td>{{#datestamp this.publishedDate}}{{/datestamp}}</td>
-					<td>{{#unix this.madeAvailable}}{{/unix}}</td>
+					<td>{{#unixWithTime this.madeAvailable}}{{/unixWithTime}}</td>
 					<td>{{#if this.publicURL}}<a href="{{this.publicURL}}">{{this.recorded}}</a>{{else}} {{this.recorded}} {{/if}} </td>
-					<td>{{this.turnaround}}</td>
+					<td>{{#secondsToHumanTime this.turnaround}}{{/secondsToHumanTime}}</td>
 					<td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
 				</tr>
 			{{/each}}
