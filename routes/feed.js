@@ -21,6 +21,18 @@ router.get('/all', function(req, res){
 	database.scan(process.env.AWS_DATA_TABLE, { available : { ComparisonOperator : "NULL" } })
 		.then(data => {
 
+			debug(data);
+
+			data.Items = data.Items.sort((a, b) => {
+				if(a.madeAvailable < b.madeAvailable){
+					return 1;
+				} else if(a.madeAvailable > b.madeAvailable) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
+			
 			const articles = data.Items.map(entry => {
 				return getContent(entry.uuid);
 			});
