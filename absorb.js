@@ -12,6 +12,8 @@ const generateS3PublicURL = require('./bin/lib/get-s3-public-url');
 
 const S3 = new AWS.S3();
 
+const ingestorAdminUrl = process.env.ADMIN_URL || 'no Admin URL specified';
+
 let poll = undefined;
 
 function parseRSSFeed(text){
@@ -133,7 +135,7 @@ function checkForData(){
 
 							if (err && err.code === 'NotFound') {
 								// We don't have that audio file, let's grab it
-								debug(`We don't have the audio for ${itemUUID}. Fetching from ${item.link}`);
+								debug(`We dont have the audio for ${itemUUID}. Fetching from ${item.link}`);
 								
 								debug(item);
 
@@ -153,7 +155,23 @@ function checkForData(){
 											}
 
 											if(process.env.ENVIRONMENT !== 'dev'){
-												mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);
+												let title   = item['title'] || 'no title specified';
+												let message = `
+A new audio file has been retrieved from Spoken Layer
+ for article ${itemUUID},
+ title: ${title}.
+
+You can find the FT copy at 
+ ${generateS3PublicURL(itemUUID)}
+
+and the Spoken Layer copy at 
+ ${metadata.originalURL}.
+
+The Ingestor admin page is
+ ${ingestorAdminUrl}
+ `;
+												let subject = `Audio file retrieved from Spoken Layer: ${title}, ${itemUUID}`;
+												mail.send(message, subject);
 											}
 
 											audit({
@@ -192,7 +210,6 @@ function checkForData(){
 }
 
 function startPolling(interval, now){
-
 	now = now || false;
 
 	if(process.env.AUDIO_RSS_ENDPOINT === undefined){

@@ -84,9 +84,11 @@ table.exposed-articles tbody tr td:nth-child(4) a{
   text-decoration: none;
 }
 
+/*
 table.exposed-articles thead th.recorded{
   width: 80px;
 }
+*/
 
 .o-techdocs-layout{
   display: flex;
