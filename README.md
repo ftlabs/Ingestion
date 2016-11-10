@@ -75,3 +75,6 @@ The region of the AWS services that we're using. Defaults to 'us-west-2' if no o
 
 ##### SENTRY_DSN
 The DSN for Sentry (for alerts when things go wrong)
+
+##### ADMIN_URL
+The url of the Admin page listing all the selected pages.

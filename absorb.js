@@ -12,7 +12,7 @@ const generateS3PublicURL = require('./bin/lib/get-s3-public-url');
 
 const S3 = new AWS.S3();
 
-const ingestorAdminUrl = 'https://ftlabs-audio-rss.herokuapp.com/ft';
+const ingestorAdminUrl = process.env.ADMIN_URL || 'no Admin URL specified';
 
 let poll = undefined;
 
