@@ -31,7 +31,7 @@ hbs.registerHelper('secondsToHumanTime', function(value){
 	if(value === "" || value === undefined || value === null || value === 0){
 		return "";
 	}
-	return `${parseInt( value / 86164 ) % 365} days, ${parseInt( value / 3600 ) % 24} hours, ${parseInt( value / 60 ) % 60} minutes and ${value % 24} seconds`;
+	return `${parseInt( value / 86164 ) % 365}d ${parseInt( value / 3600 ) % 24}h ${parseInt( value / 60 ) % 60}m ${value % 24}s`;
 });
 
 const app = express();
