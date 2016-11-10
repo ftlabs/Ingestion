@@ -43,7 +43,9 @@ router.get('/', function(req, res){
 					
 					vals.forEach( (val, idx) => {
 						let item = data.Items[idx];
-						item.recorded = val === true ? "Yes" : "No";
+						let returnedUnixTime = item['madeAvailable'] + item['turnaround'];
+						item.recorded = val === true ? returnedUnixTime : "No";
+						debug(`isRecorded: recorded=${item['recorded']}`);
 						if(val === true){
 							data.Items[idx].publicURL = generateS3PublicURL(item.uuid);							
 						}
