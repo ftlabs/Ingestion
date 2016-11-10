@@ -12,6 +12,8 @@ const generateS3PublicURL = require('./bin/lib/get-s3-public-url');
 
 const S3 = new AWS.S3();
 
+const ingestorAdminUrl = 'https://ftlabs-audio-rss.herokuapp.com/ft';
+
 let poll = undefined;
 
 function parseRSSFeed(text){
@@ -153,8 +155,23 @@ function checkForData(){
 											}
 
 											if(process.env.ENVIRONMENT !== 'dev'){
-												let title = item['title'] || 'no title specified';
-												mail.send(`A new audio has been retrieved from Spoken Layer\n for article ${itemUUID},\n title: ${title}. \nYou can find the FT copy at ${generateS3PublicURL(itemUUID)}\n and the Spoken Layer copy at ${metadata.originalURL}.`);
+												let title   = item['title'] || 'no title specified';
+												let message = `
+A new audio file has been retrieved from Spoken Layer
+ for article ${itemUUID},
+ title: ${title}.
+
+You can find the FT copy at 
+ ${generateS3PublicURL(itemUUID)}
+
+and the Spoken Layer copy at 
+ ${metadata.originalURL}.
+
+The Ingestor admin page is
+ ${ingestorAdminUrl}
+ `;
+												let subject = `Audio file retrieved from Spoken Layer: ${title}, ${itemUUID}`;
+												mail.send(message, subject);
 											}
 
 											audit({

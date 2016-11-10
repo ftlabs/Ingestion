@@ -9,9 +9,8 @@ const personalization = new helper.Personalization();
 to_emails.forEach(t => { personalization.addTo(t); });
 
 const from_email = new helper.Email(process.env.SENDGRID_SENT_FROM || 'sean.tracey@ft.com');
-const subject = 'Audio file retrieved from Spoken Layer';
 
-function sendMessage(message){
+function sendMessage(message, subject = 'Audio file retrieved from Spoken Layer'){
 	debug('sendMessage: message=' + message);
 
 	var mail = new helper.Mail();
