@@ -133,7 +133,7 @@ function checkForData(){
 
 							if (err && err.code === 'NotFound') {
 								// We don't have that audio file, let's grab it
-								debug(`We don't have the audio for ${itemUUID}. Fetching from ${item.link}`);
+								debug(`We dont have the audio for ${itemUUID}. Fetching from ${item.link}`);
 								
 								debug(item);
 
@@ -153,7 +153,8 @@ function checkForData(){
 											}
 
 											if(process.env.ENVIRONMENT !== 'dev'){
-												mail.send(`A new audio has been retrieved from Spoken Layer for article ${itemUUID}. You can find it at ${generateS3PublicURL(itemUUID)} or ${metadata.originalURL} (Spoken Layer version).`);
+												let title = item['title'] || 'no title specified';
+												mail.send(`A new audio has been retrieved from Spoken Layer\n for article ${itemUUID},\n title: ${title}. \nYou can find the FT copy at ${generateS3PublicURL(itemUUID)}\n and the Spoken Layer copy at ${metadata.originalURL}.`);
 											}
 
 											audit({
@@ -192,7 +193,6 @@ function checkForData(){
 }
 
 function startPolling(interval, now){
-
 	now = now || false;
 
 	if(process.env.AUDIO_RSS_ENDPOINT === undefined){

@@ -7,7 +7,7 @@ const from_email = new helper.Email(process.env.SENDGRID_SENT_FROM || 'sean.trac
 const subject = 'Audio file retrieved from Spoken Layer';
 
 function sendMessage(message){
-
+	debug('sendMessage: message=' + message);
 	const content = new helper.Content('text/plain', message);
 
 	recipients.forEach(person => {
