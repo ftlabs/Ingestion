@@ -13,6 +13,7 @@ const getContent = require('../bin/lib/content');
 const database = require('../bin/lib/database');
 const databaseError = require('../bin/lib/database-error');
 const generateS3PublicURL = require('../bin/lib/get-s3-public-url');
+const getTopicArticles = require('../bin/lib/search-topic');
 
 router.use(S3O);
 
@@ -20,7 +21,6 @@ router.get('/', function(req, res){
 
 	database.scan(process.env.AWS_DATA_TABLE, { available : { ComparisonOperator : "NULL" } } )
 		.then(data => {
-			debug(data);
 
 			data.Items.sort((a, b) => {
 				if(a.madeAvailable < b.madeAvailable){
@@ -40,16 +40,53 @@ router.get('/', function(req, res){
 
 			Promise.all(isRecorded)
 				.then(vals => {
+					// do a SAPI search for all artuicles tagged with the audio-articles topic
+					return getTopicArticles()
+						.then(searchResult => {
+							return{
+								vals : vals,
+								searchResult : searchResult
+							};
+						})
+					;
+				})
+				.then(valsAndSearch => {
+					// loop through search results to find all article UUIDs
+					let searchResult = valsAndSearch['searchResult'];
+					let taggedUUIDs  = {};
+
+					if (searchResult 
+						&& searchResult['results']
+						&& searchResult['results'][0]
+						&& searchResult['results'][0]['results'] 
+						) {
+						searchResult['results'][0]['results'].forEach(function(r){
+							let id = r['id'];
+							taggedUUIDs[id] = true;
+						});
+					};
 					
+					return {
+						vals: valsAndSearch['vals'],
+						taggedUUIDs: taggedUUIDs
+					};
+				})
+				.then(valsAndTaggedUUIDs => {
+					// flesh out each article item
+					let vals        = valsAndTaggedUUIDs['vals'];
+					let taggedUUIDs = valsAndTaggedUUIDs['taggedUUIDs'];
+
 					vals.forEach( (val, idx) => {
-						let item = data.Items[idx];
+						let item             = data.Items[idx];
 						let returnedUnixTime = item['madeAvailable'] + item['turnaround'];
-						item.recorded = val === true ? returnedUnixTime : "No";
-						debug(`isRecorded: recorded=${item['recorded']}`);
+						
+						item.recorded = (val === true)? returnedUnixTime : "No";
+						item.tagged   = (item.uuid in taggedUUIDs)? 'Y' : 'N';
+
+						debug(`isRecorded+tagged: tagged=${item['tagged']}, recorded=${item['recorded']}`);
 						if(val === true){
 							data.Items[idx].publicURL = generateS3PublicURL(item.uuid);							
-						}
-
+						};
 					});
 
 					res.render('list-exposed-articles', {
