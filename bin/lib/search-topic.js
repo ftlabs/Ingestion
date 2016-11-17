@@ -1,4 +1,4 @@
-const debug = require('debug')('bin:lib:content');
+const debug = require('debug')('bin:lib:search-topic');
 const fetch = require('node-fetch');
 const lru = require('lru-cache');
 
