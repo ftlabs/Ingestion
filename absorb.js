@@ -154,25 +154,23 @@ function checkForData(){
 												debug(err);
 											}
 
-											if(process.env.ENVIRONMENT !== 'dev'){
-												let title   = item['title'] || 'no title specified';
-												let message = `
+											let title   = item['title'] || 'no title specified';
+											let message = `
 A new audio file has been retrieved from Spoken Layer
- for article ${itemUUID},
- title: ${title}.
+for article ${itemUUID},
+title: ${title}.
 
 You can find the FT copy at 
- ${generateS3PublicURL(itemUUID)}
+${generateS3PublicURL(itemUUID)}
 
 and the Spoken Layer copy at 
- ${metadata.originalURL}.
+${metadata.originalURL}.
 
 The Ingestor admin page is
- ${ingestorAdminUrl}
- `;
-												let subject = `Audio file retrieved from Spoken Layer: ${title}, ${itemUUID}`;
-												mail.send(message, subject);
-											}
+${ingestorAdminUrl}
+`;
+											let subject = `Audio file retrieved from Spoken Layer: ${title}, ${itemUUID}`;
+											mail.send(message, subject);
 
 											audit({
 												user : "ABSORBER",
