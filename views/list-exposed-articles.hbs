@@ -8,6 +8,7 @@
 		<th>Published <BR>(DD-MM-YYYY)</th>
 		<th>Exposed <BR>(DD-MM-YYYY)</th>
 		<th class="recorded">Recorded?</th>
+		<th>Tagged?</th>
 		<th>Turnaround time</th>
 		<th></th>
 	</thead>
@@ -25,6 +26,7 @@
 					<td>{{#datestamp this.publishedDate}}{{/datestamp}}</td>
 					<td>{{#unixWithTime this.madeAvailable}}{{/unixWithTime}}</td>
 					<td>{{#if this.publicURL}}<a href="{{this.publicURL}}">{{#unixWithTime this.recorded}}{{/unixWithTime}}</a>{{else}} {{this.recorded}} {{/if}} </td>
+					<td>{{this.tagged}}</td>
 					<td>{{#secondsToHumanTime this.turnaround}}{{/secondsToHumanTime}}</td>
 					<td><a href="/ft/delete/{{this.uuid}}">Remove</a></td>
 				</tr>
