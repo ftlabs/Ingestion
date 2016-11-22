@@ -78,3 +78,17 @@ The DSN for Sentry (for alerts when things go wrong)
 
 ##### ADMIN_URL
 The url of the Admin page listing all the selected pages.
+
+##### MAIL_RECIPIENTS
+CSV of recipients
+
+##### MAIL_POST_AUTH_TOKEN
+
+##### MAIL_FROM_SUBDOMAIN
+the permitted subdomain for the 'from' email, ties in with auth token
+
+##### MAIL_FROM_PREFIX
+=audio-article-ingestion
+
+##### MAIL_FROM_NAME
+=Audio Article Ingestion
