@@ -22,15 +22,17 @@ const from_email_name      = process.env.MAIL_FROM_NAME;
 const mail_post_url        = process.env.MAIL_POST_URL;
 const mail_post_auth_token = process.env.MAIL_POST_AUTH_TOKEN;
 
-const from_email_address   = from_email_prefix + '@' + from_email_subdomain;
+const from_email_address   = `${from_email_prefix}@${from_email_subdomain}`;
 const defaultSubject       = 'Audio file retrieved from Spoken Layer';
 
 function sendMessage(data){
-	let subject = `Audio file retrieved from Spoken Layer: ${data.title}, ${data.itemUUID}`;
-	let plainTextContent = `
+	const subject = `Audio file retrieved from Spoken Layer: ${data.title}, ${data.itemUUID}`;
+	const plainTextContent = `
 This email is being sent to ${recipients.join(", ")}.
 
-A new audio file has been retrieved from Spoken Layer
+The Business Development team (Kayode Josiah) is running an experiment with Spoken Layer providing human-voiced audio files of FT articles (chosen by FirstFT, Andrew Jack). 
+
+A new audio file has been retrieved from Spoken Layer.
 for article ${data.itemUUID},
 title: ${data.title}.
 
@@ -40,7 +42,7 @@ ${data.ftCopyUrl}
 and the Spoken Layer copy at 
 ${data.slCopyUrl}.
 
-The Ingestor admin page is
+The Ingestion admin page is
 ${data.ingestorAdminUrl}
 `;
 
@@ -49,7 +51,10 @@ ${data.ingestorAdminUrl}
 This email is being sent to ${recipients.join(", ")}.
 </p>
 <p>
-A new audio file has been retrieved from Spoken Layer
+The Business Development team (Kayode Josiah) is running an experiment with Spoken Layer providing human-voiced audio files of FT articles (chosen by FirstFT, Andrew Jack). 
+</p>
+<p>
+A new audio file has been retrieved from Spoken Layer.
 </p>
 <p>
 for article ${data.itemUUID},
@@ -67,12 +72,12 @@ and the Spoken Layer copy at
 <a href="${data.slCopyUrl}">${data.slCopyUrl}</a>.
 </p>
 <p>
-The Ingestor admin page is
+The Ingestion admin page is
 <br>
 <a href="${data.ingestorAdminUrl}">${data.ingestorAdminUrl}</a>.
 `;
 
-	var post_body_data = {
+	let post_body_data = {
 		transmissionHeader: {
 			description: "alerting that Spoken Layer have generated a human-voiced audio file for another article",
 		    metadata: {
