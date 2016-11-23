@@ -154,23 +154,13 @@ function checkForData(){
 												debug(err);
 											}
 
-											let title   = item['title'] || 'no title specified';
-											let message = `
-A new audio file has been retrieved from Spoken Layer
-for article ${itemUUID},
-title: ${title}.
-
-You can find the FT copy at 
-${generateS3PublicURL(itemUUID)}
-
-and the Spoken Layer copy at 
-${metadata.originalURL}.
-
-The Ingestor admin page is
-${ingestorAdminUrl}
-`;
-											let subject = `Audio file retrieved from Spoken Layer: ${title}, ${itemUUID}`;
-											mail.send(message, subject);
+											mail.send({
+														itemUUID: itemUUID,
+												           title: item['title'] || 'no title specified',
+												       ftCopyUrl: generateS3PublicURL(itemUUID),
+												       slCopyUrl: metadata.originalURL,
+												ingestorAdminUrl: ingestorAdminUrl
+											});
 
 											audit({
 												user : "ABSORBER",
