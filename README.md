@@ -80,7 +80,7 @@ The DSN for Sentry (for alerts when things go wrong)
 The url of the Admin page listing all the selected pages.
 
 ##### MAIL_RECIPIENTS
-CSV of recipients
+CSV of recipients' email addresses
 
 ##### MAIL_POST_AUTH_TOKEN
 

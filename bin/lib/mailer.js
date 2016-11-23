@@ -1,9 +1,21 @@
 const debug = require('debug')('bin:lib:mailer');
 const fetch = require('node-fetch');
+const assert = require('assert');
 
-// via https://email-webservices.ft.com/docs/email-simple/#api-Send-Post_send_by_address
+// email api via https://email-webservices.ft.com/docs/email-simple/#api-Send-Post_send_by_address
 
-const recipients           = (process.env.MAIL_RECIPIENTS !== undefined) ? process.env.MAIL_RECIPIENTS.split(',') : ['ftlabs@ft.com'];
+[
+	'MAIL_RECIPIENTS',
+	'MAIL_FROM_SUBDOMAIN',
+	'MAIL_FROM_PREFIX',
+	'MAIL_FROM_NAME',
+	'MAIL_POST_URL',
+	'MAIL_POST_AUTH_TOKEN'
+].forEach(function(p){
+	assert(process.env[p], `missing env param: ${p}`);
+});
+
+const recipients           = process.env.MAIL_RECIPIENTS.split(',');
 const from_email_subdomain = process.env.MAIL_FROM_SUBDOMAIN;
 const from_email_prefix    = process.env.MAIL_FROM_PREFIX;
 const from_email_name      = process.env.MAIL_FROM_NAME;
@@ -14,8 +26,6 @@ const from_email_address   = from_email_prefix + '@' + from_email_subdomain;
 const defaultSubject       = 'Audio file retrieved from Spoken Layer';
 
 function sendMessage(data){
-	// debug('sendMessage: data=' + JSON.stringify(data));
-
 	let subject = `Audio file retrieved from Spoken Layer: ${data.title}, ${data.itemUUID}`;
 	let plainTextContent = `
 This email is being sent to ${recipients.join(", ")}.
@@ -80,8 +90,6 @@ The Ingestor admin page is
 		htmlContent:      htmlContent,
 		plainTextContent: plainTextContent
 	};
-
-	// debug(`sendMessage: post_body_data=${JSON.stringify(post_body_data)}`);
 
 	fetch(mail_post_url, {
 		method       : 'POST', 
