@@ -9,10 +9,12 @@ const audit = require('./bin/lib/audit');
 const database = require('./bin/lib/database');
 const mail = require('./bin/lib/mailer');
 const generateS3PublicURL = require('./bin/lib/get-s3-public-url');
+const convert = require('./bin/lib/convert');
 
 const S3 = new AWS.S3();
 
 const ingestorAdminUrl = process.env.ADMIN_URL || 'no Admin URL specified';
+const tmpPath = process.env.TMP_PATH || '/tmp';
 
 let poll = undefined;
 
@@ -79,6 +81,9 @@ function checkForData(){
 						debug(itemUUID);
 						debug(audioURL);
 
+						// Check whether or not we have an entry for this item in our databas
+						// If we don't, add it.
+
 						database.read({ uuid : itemUUID }, process.env.AWS_METADATA_TABLE)
 							.then(item => {
 
@@ -128,6 +133,9 @@ function checkForData(){
 							})
 						;
 
+						// Check if we have a copy of the MP3 from our 3rd party partner.
+						// If not, grab it and put it in the S3 bucket
+
 						S3.headObject({
 							Bucket : process.env.AWS_AUDIO_BUCKET,
 							Key : `${itemUUID}.mp3`
@@ -175,10 +183,89 @@ function checkForData(){
 								;
 
 							} else if(err){
-								debug("An error occurred querying the S3 bucket", err);
+								debug(`An error occurred querying the S3 bucket for ${itemUUID}.mp3`, err);
 							} else {
-								debug(`The audio for ${itemUUID} is already in the S3 bucket`);
+								debug(`The MP3 version of ${itemUUID} is already in the S3 bucket`);
+							}
 
+						});
+
+						S3.headObject({
+							Bucket : process.env.AWS_AUDIO_BUCKET,
+							Key : `${itemUUID}.ogg`
+						}, function(err){
+
+							if (err && err.code === 'NotFound') {
+								debug(`We don't have an OGG version of ${itemUUID}. Beginning conversion now`);
+
+								const localDestination = `${tmpPath}/${itemUUID}.mp3`;
+								fetch(audioURL)
+									.then(res => {
+										const fsStream = fs.createWriteStream(`${tmpPath}/${itemUUID}.mp3`);
+										
+										return new Promise((resolve) => {
+
+											fsStream.on('close', function(){
+												debug(`${itemUUID}.mp3 has been written to ${localDestination}`);
+												resolve();
+											})
+
+											res.body.pipe(fsStream);
+
+										});
+
+									})
+									.then(function(){
+										audit({
+											user : 'ABSORBER',
+											action : 'convertFileToOGG',
+											article : itemUUID
+										});
+										return convert.ogg({
+											filePath : localDestination,
+											name : itemUUID
+										});
+									})
+									.then(conversionDestination => {
+										debug(`${itemUUID} has been converted to OGG and can be found at ${conversionDestination}`);
+
+										fs.readFile(conversionDestination, (err, data) => {
+
+											S3.putObject({
+												Bucket : process.env.AWS_AUDIO_BUCKET,
+												Key : `${itemUUID}.ogg`,
+												Body : data,
+												ACL : 'public-read'
+											},function(err){
+												
+												if(err){
+													debug(err);
+												} else {
+													debug(`${itemUUID}.ogg successfully uploaded to ${process.env.AWS_AUDIO_BUCKET}`);
+													fs.unlink(conversionDestination);
+
+													audit({
+														user : 'ABSORBER',
+														action : 'storeConvertedOGGToS3',
+														article : itemUUID
+													});
+
+												}
+
+
+											})
+
+										})
+
+									})
+									.catch(err => {
+										debug(`An error occurred when we tried to convert ${itemUUID}.mp3 to OGG and upload it to S3`, err);
+									})
+								;
+							} else if(err){
+								debug(`An error occurred querying the S3 bucket for ${itemUUID}.ogv`, err);
+							} else {
+								debug(`The OGV version of ${itemUUID} is already in the S3 bucket`);
 							}
 
 						});
