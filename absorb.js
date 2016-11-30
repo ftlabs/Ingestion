@@ -196,7 +196,7 @@ function checkForData(){
 						}, function(err){
 
 							if (err && err.code === 'NotFound') {
-								debug(`We don't have an OGV version of ${itemUUID}. Beginning conversion now`);
+								debug(`We don't have an OGG version of ${itemUUID}. Beginning conversion now`);
 
 								const localDestination = `${tmpPath}/${itemUUID}.mp3`;
 								fetch(audioURL)
