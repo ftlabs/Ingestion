@@ -1,6 +1,8 @@
 # Ingestion
 An app to expose select content to our 3rd-party partners.
 
+⚠️⚠️⚠️ **This project has been shut down and is no longer supported by FT Labs** ⚠️⚠️⚠️
+
 ## Installation
 
 1. Clone this repo
